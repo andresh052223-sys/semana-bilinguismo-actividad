@@ -1,5 +1,13 @@
 import React from 'react';
-import { Play } from 'lucide-react';
+import {
+  Play,
+  Compass,
+  HeartHandshake,
+  Mountain,
+  Coffee,
+  Globe,
+  Sparkles,
+} from 'lucide-react';
 import { soundManager } from '../services/audioService';
 
 interface CoverScreenProps {
@@ -13,32 +21,166 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({ onStart, isTvMode }) =
     onStart();
   };
 
+  const sections = [
+    {
+      id: 'discover',
+      num: '01',
+      title: 'DISCOVER',
+      subtitle: 'Nature & Heritage',
+      icon: Compass,
+      borderColor: 'border-cyan-500/50 hover:border-cyan-400',
+      badgeBg: 'bg-cyan-500/20 text-cyan-300',
+      glow: 'shadow-cyan-950/60',
+      accent: 'from-cyan-500/20 via-cyan-900/10 to-transparent',
+    },
+    {
+      id: 'welcome',
+      num: '02',
+      title: 'WELCOME',
+      subtitle: 'Hospitality & Warmth',
+      icon: HeartHandshake,
+      borderColor: 'border-emerald-500/50 hover:border-emerald-400',
+      badgeBg: 'bg-emerald-500/20 text-emerald-300',
+      glow: 'shadow-emerald-950/60',
+      accent: 'from-emerald-500/20 via-emerald-900/10 to-transparent',
+    },
+    {
+      id: 'explore',
+      num: '03',
+      title: 'EXPLORE',
+      subtitle: 'Trails & Adventure',
+      icon: Mountain,
+      borderColor: 'border-amber-500/50 hover:border-amber-400',
+      badgeBg: 'bg-amber-500/20 text-amber-300',
+      glow: 'shadow-amber-950/60',
+      accent: 'from-amber-500/20 via-amber-900/10 to-transparent',
+    },
+    {
+      id: 'serve',
+      num: '04',
+      title: 'SERVE',
+      subtitle: 'Gastronomy & Coffee',
+      icon: Coffee,
+      borderColor: 'border-rose-500/50 hover:border-rose-400',
+      badgeBg: 'bg-rose-500/20 text-rose-300',
+      glow: 'shadow-rose-950/60',
+      accent: 'from-rose-500/20 via-rose-900/10 to-transparent',
+    },
+    {
+      id: 'communicate',
+      num: '05',
+      title: 'COMMUNICATE',
+      subtitle: 'Bilingual Connection',
+      icon: Globe,
+      borderColor: 'border-indigo-500/50 hover:border-indigo-400',
+      badgeBg: 'bg-indigo-500/20 text-indigo-300',
+      glow: 'shadow-indigo-950/60',
+      accent: 'from-indigo-500/20 via-indigo-900/10 to-transparent',
+    },
+  ];
+
   return (
-    <div className="w-full max-w-3xl mx-auto py-6 sm:py-10 px-4 flex flex-col items-center justify-center min-h-[82vh]">
-      {/* Enhanced Graphic Card from User Upload */}
-      <div className="relative group w-full max-w-lg mx-auto rounded-3xl overflow-hidden shadow-2xl shadow-cyan-950/50 border-4 border-cyan-500/40 bg-white transition-all transform hover:scale-[1.01]">
-        <img
-          src="/src/assets/images/global_tourism_card_1791509637338.jpg"
-          alt="Global Tourism District - Sena Global City"
-          className="w-full h-auto object-cover aspect-square block"
-          loading="eager"
-        />
-        {/* Subtle overlay reflection */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent pointer-events-none" />
+    <div className="w-full max-w-7xl mx-auto py-8 sm:py-12 lg:py-16 px-4 sm:px-6 flex flex-col items-center justify-center min-h-[86vh]">
+      {/* Top Tag / Subtitle */}
+      <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-slate-900/80 border border-slate-700/70 text-emerald-400 mb-6 sm:mb-8 backdrop-blur-md shadow-lg">
+        <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
+        <span className="text-xs sm:text-sm font-bold tracking-widest uppercase">
+          SENA Global City · Bilingual English Challenge
+        </span>
       </div>
 
-      {/* Big Minimalist "START" Button directly beneath the card */}
-      <div className="mt-8 sm:mt-10 w-full max-w-md mx-auto">
+      {/* Main Title: GLOBAL TOURISM DISTRICT (Very large and visible) */}
+      <div className="text-center w-full max-w-5xl mx-auto">
+        <h1
+          className={`font-display font-black tracking-tight text-white uppercase text-center leading-[0.95] drop-shadow-2xl ${
+            isTvMode
+              ? 'text-6xl sm:text-8xl md:text-9xl lg:text-[10rem]'
+              : 'text-5xl sm:text-7xl md:text-8xl lg:text-9xl'
+          }`}
+        >
+          <span>GLOBAL TOURISM </span>
+          <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(16,185,129,0.4)]">
+            DISTRICT
+          </span>
+        </h1>
+
+        {/* Big Visible Slogan: Discover - Welcome - Experience */}
+        <div className="mt-6 sm:mt-8">
+          <p
+            className={`font-display font-extrabold tracking-[0.2em] sm:tracking-[0.28em] text-cyan-300 uppercase text-center drop-shadow-lg ${
+              isTvMode
+                ? 'text-3xl sm:text-5xl md:text-6xl'
+                : 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl'
+            }`}
+          >
+            DISCOVER <span className="text-emerald-400 mx-1 sm:mx-3 font-light">—</span> WELCOME <span className="text-emerald-400 mx-1 sm:mx-3 font-light">—</span> EXPERIENCE
+          </p>
+        </div>
+      </div>
+
+      {/* The 5 Key Sections: Discover, Welcome, Explore, Serve, Communicate */}
+      <div className="w-full mt-10 sm:mt-14 max-w-6xl mx-auto">
+        <div className="text-center mb-6">
+          <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-slate-400">
+            DISTRICT PILLARS & AREAS
+          </span>
+        </div>
+
+        {/* 5 Prominent Cards in Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
+          {sections.map((sec) => {
+            const Icon = sec.icon;
+            return (
+              <div
+                key={sec.id}
+                className={`relative group rounded-3xl p-6 sm:p-7 bg-slate-900/90 border-2 ${sec.borderColor} bg-gradient-to-b ${sec.accent} backdrop-blur-xl shadow-xl ${sec.glow} transition-all duration-300 transform hover:-translate-y-1.5 hover:shadow-2xl flex flex-col justify-between`}
+              >
+                {/* Number & Icon */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`text-xs font-mono font-black px-2.5 py-1 rounded-lg ${sec.badgeBg}`}>
+                    {sec.num}
+                  </span>
+                  <div className={`p-2.5 rounded-2xl ${sec.badgeBg}`}>
+                    <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
+                  </div>
+                </div>
+
+                {/* Section Title (Very Large and Visible) */}
+                <div className="mt-2">
+                  <h3
+                    className={`font-display font-black text-white tracking-wide uppercase leading-tight ${
+                      isTvMode
+                        ? 'text-2xl sm:text-3xl lg:text-4xl'
+                        : 'text-xl sm:text-2xl lg:text-3xl'
+                    }`}
+                  >
+                    {sec.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-400 mt-1.5 font-medium">
+                    {sec.subtitle}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Big Minimalist "START" Button directly beneath the cards */}
+      <div className="mt-12 sm:mt-16 w-full max-w-lg mx-auto">
         <button
           type="button"
           onClick={handleStart}
-          className={`w-full py-5 sm:py-6 px-10 rounded-3xl bg-gradient-to-r from-[#0097A7] via-[#00ACC1] to-emerald-500 hover:from-[#00838F] hover:to-emerald-600 text-white font-display font-black text-2xl sm:text-3xl tracking-wider shadow-2xl shadow-cyan-950/60 flex items-center justify-center gap-4 transition-all transform hover:scale-105 active:scale-95 border-2 border-cyan-200/40 cursor-pointer ${
-            isTvMode ? 'py-7 text-4xl' : ''
+          className={`w-full py-6 sm:py-7 px-10 rounded-3xl bg-gradient-to-r from-[#0097A7] via-[#00ACC1] to-emerald-500 hover:from-[#00838F] hover:to-emerald-600 text-white font-display font-black tracking-wider shadow-2xl shadow-cyan-950/70 flex items-center justify-center gap-4 transition-all transform hover:scale-105 active:scale-95 border-2 border-cyan-200/50 cursor-pointer ${
+            isTvMode ? 'py-8 text-4xl sm:text-5xl' : 'text-3xl sm:text-4xl'
           }`}
         >
-          <Play className="w-8 h-8 sm:w-10 sm:h-10 fill-current" />
+          <Play className="w-9 h-9 sm:w-11 sm:h-11 fill-current" />
           <span>START</span>
         </button>
+        <p className="text-center text-xs sm:text-sm text-slate-400 mt-3 font-medium">
+          Presiona <span className="text-cyan-300 font-bold">START</span> para elegir tu tema e iniciar el reto
+        </p>
       </div>
     </div>
   );
