@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --color-sena-green: #39A900;
+  --color-sena-green-dark: #2d8500;
+  --color-sena-navy: #00324D;
+  --color-sena-navy-dark: #001f30;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+  }
+}
+

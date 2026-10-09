@@ -1,0 +1,6 @@
+{
+  "name": "SENA Bilingual Challenge",
+  "description": "Interactive and gamified English vocabulary quiz for SENA Bilingualism Week with program-specific technical English, PDF certificate, and TV-ready game show UI.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
