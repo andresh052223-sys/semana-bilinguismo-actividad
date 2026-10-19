@@ -1,6 +1,7 @@
 import { EnglishLevel, QuizQuestion, VocabularyItem } from '../types/quiz';
 import { getStoredVocabulary } from './storageService';
 import { formatMaxTwoWords, formatMaxNaturalWords } from '../data/defaultVocabulary';
+import { getTrekingQuizQuestions } from '../data/trekingData';
 
 // Utility to shuffle array immutably
 export function shuffleArray<T>(array: T[]): T[] {
@@ -68,10 +69,13 @@ export function getLevelDetails(level: EnglishLevel) {
 /**
  * Builds a quiz of `totalCount` questions (default 100) for the selected topic:
  * Directly drawn from the topic's 150 questions bank!
- * ONLY shows the English word as the prompt (clean, minimalist, extra large font).
- * Options are the 4 Spanish translations (1 correct + 3 distractors).
+ * For TREKING: draws directly from the official 12 questions of the PDF!
  */
 export function generateQuizForProgram(programName: string, totalCount = 100): QuizQuestion[] {
+  if (programName.trim().toUpperCase() === 'TREKING') {
+    return getTrekingQuizQuestions();
+  }
+
   const allVocab = getStoredVocabulary();
 
   // Pick from the 150 questions of the selected topic

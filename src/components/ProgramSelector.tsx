@@ -8,8 +8,10 @@ import {
   Footprints,
   Waves,
   Mountain,
+  Compass,
   ArrowRight,
   Check,
+  Sparkles,
 } from 'lucide-react';
 import { soundManager } from '../services/audioService';
 
@@ -27,6 +29,7 @@ const PROGRAM_ICONS: Record<string, React.ReactNode> = {
   'Senderismo (Hiking)': <Footprints className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400" />,
   'Cascadas de Padilla': <Waves className="w-8 h-8 sm:w-10 sm:h-10 text-sky-400" />,
   'Alta montaña (High Mountain)': <Mountain className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-400" />,
+  'TREKING': <Compass className="w-8 h-8 sm:w-10 sm:h-10 text-teal-400" />,
 };
 
 const GTD_PROGRAMS = [
@@ -38,6 +41,7 @@ const GTD_PROGRAMS = [
   'Senderismo (Hiking)',
   'Cascadas de Padilla',
   'Alta montaña (High Mountain)',
+  'TREKING',
 ];
 
 export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
@@ -68,10 +72,11 @@ export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
         </p>
       </div>
 
-      {/* Grid of 8 Topics with Large Typography */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 mb-10 max-w-5xl mx-auto w-full">
+      {/* Grid of 9 Topics with Large Typography */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10 max-w-6xl mx-auto w-full">
         {GTD_PROGRAMS.map((prog) => {
           const isSelected = selectedProgram === prog;
+          const isTreking = prog === 'TREKING';
           const icon = PROGRAM_ICONS[prog] || <Mountain className="w-8 h-8 text-emerald-400" />;
 
           return (
@@ -79,40 +84,58 @@ export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
               key={prog}
               type="button"
               onClick={() => handleProgramClick(prog)}
-              className={`p-6 sm:p-8 rounded-3xl border-2 text-left transition-all flex items-center justify-between gap-4 cursor-pointer ${
+              className={`p-6 sm:p-7 rounded-3xl border-2 text-left transition-all flex items-center justify-between gap-4 cursor-pointer relative overflow-hidden ${
                 isSelected
-                  ? 'bg-slate-900 border-[#39A900] ring-4 ring-[#39A900]/30 shadow-2xl scale-[1.02]'
+                  ? isTreking
+                    ? 'bg-slate-900 border-cyan-400 ring-4 ring-cyan-500/30 shadow-2xl scale-[1.02]'
+                    : 'bg-slate-900 border-[#39A900] ring-4 ring-[#39A900]/30 shadow-2xl scale-[1.02]'
                   : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
               }`}
             >
-              <div className="flex items-center gap-4 sm:gap-6 flex-1 min-w-0">
+              {isTreking && (
+                <div className="absolute top-0 right-0 bg-gradient-to-l from-cyan-500/20 to-transparent px-3 py-1 text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-widest rounded-bl-xl border-b border-l border-cyan-500/30">
+                  Nuevo Módulo
+                </div>
+              )}
+
+              <div className="flex items-center gap-4 sm:gap-5 flex-1 min-w-0">
                 <div
-                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0 border ${
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 border ${
                     isSelected
-                      ? 'bg-emerald-500/20 border-emerald-500/40'
+                      ? isTreking
+                        ? 'bg-cyan-500/20 border-cyan-500/40'
+                        : 'bg-emerald-500/20 border-emerald-500/40'
                       : 'bg-slate-950 border-slate-800'
                   }`}
                 >
                   {icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span className="font-display font-black text-xl sm:text-2xl lg:text-3xl text-white block leading-tight break-words">
+                  <span className="font-display font-black text-lg sm:text-xl lg:text-2xl text-white block leading-tight break-words">
                     {prog}
                   </span>
-                  <span className="text-xs sm:text-sm font-mono text-emerald-400 font-bold block mt-1.5">
-                    100 Questions Challenge
+                  <span
+                    className={`text-xs font-mono font-bold block mt-1.5 ${
+                      isTreking ? 'text-cyan-300' : 'text-emerald-400'
+                    }`}
+                  >
+                    {isTreking
+                      ? 'Guía PDF & 12 Preguntas'
+                      : '100 Questions Challenge'}
                   </span>
                 </div>
               </div>
 
               <div
-                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
                   isSelected
-                    ? 'bg-[#39A900] border-[#39A900] text-white shadow-lg'
+                    ? isTreking
+                      ? 'bg-cyan-500 border-cyan-400 text-white shadow-lg'
+                      : 'bg-[#39A900] border-[#39A900] text-white shadow-lg'
                     : 'border-slate-700 text-transparent'
                 }`}
               >
-                <Check className="w-5 h-5 sm:w-6 sm:h-6 stroke-[3]" />
+                <Check className="w-4 h-4 stroke-[3]" />
               </div>
             </button>
           );

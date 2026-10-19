@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={() => onNavigate('program')}
             className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 ${
-              currentView === 'welcome' || currentView === 'register' || currentView === 'program' || currentView === 'quiz' || currentView === 'result'
+              currentView === 'welcome' || currentView === 'register' || currentView === 'program' || currentView === 'quiz' || currentView === 'result' || currentView === 'treking'
                 ? 'bg-[#39A900] text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}

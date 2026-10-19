@@ -7,6 +7,7 @@ import { QuizGame } from './components/QuizGame';
 import { ResultScreen } from './components/ResultScreen';
 import { PublicRanking } from './components/PublicRanking';
 import { AdminDashboard } from './components/AdminDashboard';
+import { TrekkingModule } from './components/TrekkingModule';
 import { ParticipantData, QuizQuestion, QuizResult } from './types/quiz';
 import { generateQuizForProgram } from './services/quizEngine';
 import { saveQuizResult } from './services/storageService';
@@ -19,7 +20,8 @@ type AppView =
   | 'quiz'
   | 'result'
   | 'ranking'
-  | 'admin';
+  | 'admin'
+  | 'treking';
 
 export default function App() {
   // App opens directly in the COVER SCREEN with image and START button!
@@ -53,10 +55,14 @@ export default function App() {
     setCurrentView('program');
   };
 
-  // Step 2: Topic Selected -> Advances to Registration
+  // Step 2: Topic Selected -> Advances to Registration or Trekking Module
   const handleProgramSelected = (programName: string) => {
     setSelectedProgram(programName);
-    setCurrentView('register');
+    if (programName === 'TREKING') {
+      setCurrentView('treking');
+    } else {
+      setCurrentView('register');
+    }
   };
 
   // Step 3: Completed Registration form -> Generates 100 questions & starts Quiz
@@ -136,6 +142,17 @@ export default function App() {
             selectedProgram={selectedProgram}
             onComplete={handleRegistrationComplete}
             onBack={() => setCurrentView('program')}
+            isTvMode={isTvMode}
+          />
+        )}
+
+        {/* Step 3.5: NOVENO MÓDULO: TREKING (Parte 1: Información & Parte 2: 12 Preguntas) */}
+        {currentView === 'treking' && (
+          <TrekkingModule
+            participant={participant}
+            onUpdateParticipant={(updated) => setParticipant(updated)}
+            onFinishQuiz={handleFinishQuiz}
+            onBackToMenu={() => setCurrentView('program')}
             isTvMode={isTvMode}
           />
         )}

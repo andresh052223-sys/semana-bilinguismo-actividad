@@ -11,7 +11,7 @@ import {
 
 const STORAGE_KEYS = {
   VOCABULARY: 'gtd_vocabulary_v6',
-  PROGRAMS: 'gtd_programs_v2',
+  PROGRAMS: 'gtd_programs_v3',
   RESULTS: 'gtd_results_v3',
   ADMIN_PASSWORD: 'gtd_admin_pwd_v2',
 };
@@ -26,7 +26,14 @@ export function getStoredPrograms(): string[] {
     const raw = localStorage.getItem(STORAGE_KEYS.PROGRAMS);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Ensure TREKING is included
+        if (!parsed.includes('TREKING')) {
+          parsed.push('TREKING');
+          localStorage.setItem(STORAGE_KEYS.PROGRAMS, JSON.stringify(parsed));
+        }
+        return parsed;
+      }
     }
   } catch (e) {
     console.error('Error loading stored programs:', e);

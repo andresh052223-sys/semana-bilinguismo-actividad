@@ -20,6 +20,7 @@ export const INITIAL_PROGRAMS: string[] = [
   'Senderismo (Hiking)',
   'Cascadas de Padilla',
   'Alta montaña (High Mountain)',
+  'TREKING',
 ];
 
 export function formatMaxTwoWords(text: string): string {
