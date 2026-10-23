@@ -8,6 +8,7 @@ import { ResultScreen } from './components/ResultScreen';
 import { PublicRanking } from './components/PublicRanking';
 import { AdminDashboard } from './components/AdminDashboard';
 import { TrekkingModule } from './components/TrekkingModule';
+import { TouristTourGuideModule } from './components/TouristTourGuideModule';
 import { ParticipantData, QuizQuestion, QuizResult } from './types/quiz';
 import { generateQuizForProgram } from './services/quizEngine';
 import { saveQuizResult } from './services/storageService';
@@ -21,7 +22,8 @@ type AppView =
   | 'result'
   | 'ranking'
   | 'admin'
-  | 'treking';
+  | 'treking'
+  | 'tourist_guide';
 
 export default function App() {
   // App opens directly in the COVER SCREEN with image and START button!
@@ -55,11 +57,13 @@ export default function App() {
     setCurrentView('program');
   };
 
-  // Step 2: Topic Selected -> Advances to Registration or Trekking Module
+  // Step 2: Topic Selected -> Advances to Registration, Trekking, or Tourist Guide Module
   const handleProgramSelected = (programName: string) => {
     setSelectedProgram(programName);
     if (programName === 'TREKING') {
       setCurrentView('treking');
+    } else if (programName === 'Tourist & Tour Guide') {
+      setCurrentView('tourist_guide');
     } else {
       setCurrentView('register');
     }
@@ -149,6 +153,17 @@ export default function App() {
         {/* Step 3.5: NOVENO MÓDULO: TREKING (Parte 1: Información & Parte 2: 12 Preguntas) */}
         {currentView === 'treking' && (
           <TrekkingModule
+            participant={participant}
+            onUpdateParticipant={(updated) => setParticipant(updated)}
+            onFinishQuiz={handleFinishQuiz}
+            onBackToMenu={() => setCurrentView('program')}
+            isTvMode={isTvMode}
+          />
+        )}
+
+        {/* Step 3.6: DÉCIMO MÓDULO: TOURIST & TOUR GUIDE (Places, Directions, Multiple Choice Quiz) */}
+        {currentView === 'tourist_guide' && (
+          <TouristTourGuideModule
             participant={participant}
             onUpdateParticipant={(updated) => setParticipant(updated)}
             onFinishQuiz={handleFinishQuiz}

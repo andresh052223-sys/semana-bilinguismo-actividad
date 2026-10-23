@@ -43,6 +43,37 @@ import {
 import { ParticipantData, QuizResult } from '../types/quiz';
 import { determineEnglishLevel } from '../services/quizEngine';
 
+const getQuestionImage = (qNum: number): string => {
+  switch (qNum) {
+    case 1:
+      return '/assets/aistudio/item_hiking_boots.png';
+    case 2:
+      return '/assets/aistudio/item_backpack.png';
+    case 3:
+      return '/assets/aistudio/item_tent.png';
+    case 4:
+      return '/assets/aistudio/item_sleeping_bag.png';
+    case 5:
+      return '/assets/aistudio/item_map_compass.png';
+    case 6:
+      return '/assets/aistudio/item_binoculars.png';
+    case 7:
+      return '/assets/aistudio/item_bird_guide.png';
+    case 8:
+      return '/assets/aistudio/item_camera.png';
+    case 9:
+      return '/assets/aistudio/slide_img_1_hiking_trekking.jpg';
+    case 10:
+      return '/assets/aistudio/item_water_bottle.jpg';
+    case 11:
+      return '/assets/aistudio/item_poles.png';
+    case 12:
+      return '/assets/aistudio/item_first_aid_kit.jpg';
+    default:
+      return '/assets/aistudio/slide_img_1_hiking_trekking.jpg';
+  }
+};
+
 interface TrekkingModuleProps {
   participant: ParticipantData | null;
   onUpdateParticipant: (participant: ParticipantData) => void;
@@ -101,16 +132,15 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
 
   const handleStartPart2 = () => {
     soundManager.playClick();
-    if (isPresentationMode) {
-      handleClosePresentation();
-    }
     setActivePart('part2');
   };
 
   // Presentation Mode Handlers
-  const handleOpenPresentation = (index = currentSlideIndex) => {
+  const handleOpenPresentation = (index?: number) => {
     soundManager.playClick();
-    setCurrentSlideIndex(index);
+    if (activePart === 'part1' && typeof index === 'number') {
+      setCurrentSlideIndex(index);
+    }
     setIsPresentationMode(true);
     try {
       if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
@@ -121,6 +151,11 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
     } catch {
       // Graceful fallback if fullscreen is blocked by browser policies
     }
+  };
+
+  const handleSwitchPresentationPart = (part: 'part1' | 'part2') => {
+    soundManager.playClick();
+    setActivePart(part);
   };
 
   const handleClosePresentation = () => {
@@ -165,22 +200,48 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
-        setCurrentSlideIndex((prev) => {
-          if (prev < TREKING_12_PRESENTATION_SLIDES.length - 1) {
-            soundManager.playClick();
-            return prev + 1;
-          }
-          return prev;
-        });
+        if (activePart === 'part1') {
+          setCurrentSlideIndex((prev) => {
+            if (prev < TREKING_12_PRESENTATION_SLIDES.length - 1) {
+              soundManager.playClick();
+              return prev + 1;
+            }
+            return prev;
+          });
+        } else {
+          setCurrentIndex((prev) => {
+            if (prev < TREKING_12_QUESTIONS.length - 1) {
+              soundManager.playClick();
+              setSelectedOption(null);
+              setIsAnswered(false);
+              setIsCorrect(false);
+              return prev + 1;
+            }
+            return prev;
+          });
+        }
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        setCurrentSlideIndex((prev) => {
-          if (prev > 0) {
-            soundManager.playClick();
-            return prev - 1;
-          }
-          return prev;
-        });
+        if (activePart === 'part1') {
+          setCurrentSlideIndex((prev) => {
+            if (prev > 0) {
+              soundManager.playClick();
+              return prev - 1;
+            }
+            return prev;
+          });
+        } else {
+          setCurrentIndex((prev) => {
+            if (prev > 0) {
+              soundManager.playClick();
+              setSelectedOption(null);
+              setIsAnswered(false);
+              setIsCorrect(false);
+              return prev - 1;
+            }
+            return prev;
+          });
+        }
       } else if (e.key === 'Escape') {
         handleClosePresentation();
       }
@@ -188,7 +249,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPresentationMode]);
+  }, [isPresentationMode, activePart]);
 
   // Track browser fullscreen changes
   useEffect(() => {

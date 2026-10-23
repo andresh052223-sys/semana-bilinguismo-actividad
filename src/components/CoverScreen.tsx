@@ -119,47 +119,50 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({ onStart, isTvMode }) =
       </div>
 
       {/* The 5 Key Sections: Discover, Welcome, Explore, Serve, Communicate */}
-      <div className="w-full mt-10 sm:mt-14 max-w-6xl mx-auto">
+      <div className="w-full mt-10 sm:mt-14 max-w-7xl mx-auto px-2">
         <div className="text-center mb-6">
-          <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-slate-400">
+          <span className="text-xs sm:text-sm font-bold tracking-[0.25em] uppercase text-emerald-400/90 font-mono">
             DISTRICT PILLARS & AREAS
           </span>
         </div>
 
         {/* 5 Prominent Cards in Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4 xl:gap-5">
           {sections.map((sec) => {
             const Icon = sec.icon;
             return (
               <div
                 key={sec.id}
-                className={`relative group rounded-3xl p-6 sm:p-7 bg-slate-900/90 border-2 ${sec.borderColor} bg-gradient-to-b ${sec.accent} backdrop-blur-xl shadow-xl ${sec.glow} transition-all duration-300 transform hover:-translate-y-1.5 hover:shadow-2xl flex flex-col justify-between`}
+                className={`relative group rounded-3xl p-5 sm:p-5 lg:p-4 xl:p-6 bg-slate-900/90 border-2 ${sec.borderColor} bg-gradient-to-b ${sec.accent} backdrop-blur-xl shadow-xl ${sec.glow} transition-all duration-300 transform hover:-translate-y-1.5 hover:shadow-2xl flex flex-col justify-between items-center text-center overflow-hidden min-h-[170px] sm:min-h-[190px]`}
               >
                 {/* Number & Icon */}
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`text-xs font-mono font-black px-2.5 py-1 rounded-lg ${sec.badgeBg}`}>
+                <div className="flex items-center justify-between w-full mb-4">
+                  <span className={`text-[11px] font-mono font-black px-2.5 py-1 rounded-lg ${sec.badgeBg} border border-current/20`}>
                     {sec.num}
                   </span>
-                  <div className={`p-2.5 rounded-2xl ${sec.badgeBg}`}>
-                    <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
+                  <div className={`p-2 sm:p-2.5 rounded-2xl ${sec.badgeBg} border border-current/20 shadow-md`}>
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                 </div>
 
-                {/* Section Title (Very Large and Visible) */}
-                <div className="mt-2">
+                {/* Section Title & Subtitle Centered */}
+                <div className="w-full text-center my-auto flex flex-col items-center justify-center">
                   <h3
-                    className={`font-display font-black text-white tracking-wide uppercase leading-tight ${
-                      isTvMode
-                        ? 'text-2xl sm:text-3xl lg:text-4xl'
-                        : 'text-xl sm:text-2xl lg:text-3xl'
-                    }`}
+                    className={`font-display font-black text-white tracking-normal uppercase text-center leading-tight w-full ${
+                      sec.title === 'COMMUNICATE'
+                        ? 'text-base sm:text-lg lg:text-[15px] xl:text-lg 2xl:text-xl'
+                        : 'text-lg sm:text-xl lg:text-base xl:text-xl 2xl:text-2xl'
+                    } ${isTvMode ? 'text-xl sm:text-2xl' : ''}`}
                   >
                     {sec.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-400 mt-1.5 font-medium">
+                  <p className="text-[11px] sm:text-xs text-slate-400 mt-2 font-medium text-center leading-snug w-full">
                     {sec.subtitle}
                   </p>
                 </div>
+
+                {/* Subtle bottom indicator */}
+                <div className="w-8 h-1 rounded-full bg-slate-700/60 group-hover:w-14 group-hover:bg-slate-500 transition-all duration-300 mt-3" />
               </div>
             );
           })}

@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Check,
   Sparkles,
+  Landmark,
 } from 'lucide-react';
 import { soundManager } from '../services/audioService';
 
@@ -30,6 +31,7 @@ const PROGRAM_ICONS: Record<string, React.ReactNode> = {
   'Cascadas de Padilla': <Waves className="w-8 h-8 sm:w-10 sm:h-10 text-sky-400" />,
   'Alta montaña (High Mountain)': <Mountain className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-400" />,
   'TREKING': <Compass className="w-8 h-8 sm:w-10 sm:h-10 text-teal-400" />,
+  'Tourist & Tour Guide': <Landmark className="w-8 h-8 sm:w-10 sm:h-10 text-amber-400" />,
 };
 
 const GTD_PROGRAMS = [
@@ -42,6 +44,7 @@ const GTD_PROGRAMS = [
   'Cascadas de Padilla',
   'Alta montaña (High Mountain)',
   'TREKING',
+  'Tourist & Tour Guide',
 ];
 
 export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
@@ -77,6 +80,7 @@ export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
         {GTD_PROGRAMS.map((prog) => {
           const isSelected = selectedProgram === prog;
           const isTreking = prog === 'TREKING';
+          const isTouristGuide = prog === 'Tourist & Tour Guide';
           const icon = PROGRAM_ICONS[prog] || <Mountain className="w-8 h-8 text-emerald-400" />;
 
           return (
@@ -88,13 +92,20 @@ export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
                 isSelected
                   ? isTreking
                     ? 'bg-slate-900 border-cyan-400 ring-4 ring-cyan-500/30 shadow-2xl scale-[1.02]'
+                    : isTouristGuide
+                    ? 'bg-slate-900 border-amber-400 ring-4 ring-amber-500/30 shadow-2xl scale-[1.02]'
                     : 'bg-slate-900 border-[#39A900] ring-4 ring-[#39A900]/30 shadow-2xl scale-[1.02]'
                   : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
               }`}
             >
               {isTreking && (
                 <div className="absolute top-0 right-0 bg-gradient-to-l from-cyan-500/20 to-transparent px-3 py-1 text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-widest rounded-bl-xl border-b border-l border-cyan-500/30">
-                  Nuevo Módulo
+                  Módulo 9
+                </div>
+              )}
+              {isTouristGuide && (
+                <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-500/20 to-transparent px-3 py-1 text-[10px] font-mono font-bold text-amber-300 uppercase tracking-widest rounded-bl-xl border-b border-l border-amber-500/30">
+                  Módulo 10
                 </div>
               )}
 
@@ -104,6 +115,8 @@ export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
                     isSelected
                       ? isTreking
                         ? 'bg-cyan-500/20 border-cyan-500/40'
+                        : isTouristGuide
+                        ? 'bg-amber-500/20 border-amber-500/40'
                         : 'bg-emerald-500/20 border-emerald-500/40'
                       : 'bg-slate-950 border-slate-800'
                   }`}
@@ -116,11 +129,17 @@ export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
                   </span>
                   <span
                     className={`text-xs font-mono font-bold block mt-1.5 ${
-                      isTreking ? 'text-cyan-300' : 'text-emerald-400'
+                      isTreking
+                        ? 'text-cyan-300'
+                        : isTouristGuide
+                        ? 'text-amber-300'
+                        : 'text-emerald-400'
                     }`}
                   >
                     {isTreking
                       ? 'Guía PDF & 12 Preguntas'
+                      : isTouristGuide
+                      ? 'Places · Directions · Quiz'
                       : '100 Questions Challenge'}
                   </span>
                 </div>
@@ -131,6 +150,8 @@ export const ProgramSelector: React.FC<ProgramSelectorProps> = ({
                   isSelected
                     ? isTreking
                       ? 'bg-cyan-500 border-cyan-400 text-white shadow-lg'
+                      : isTouristGuide
+                      ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-lg'
                       : 'bg-[#39A900] border-[#39A900] text-white shadow-lg'
                     : 'border-slate-700 text-transparent'
                 }`}

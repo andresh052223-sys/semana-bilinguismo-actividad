@@ -27,9 +27,17 @@ export function getStoredPrograms(): string[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Ensure TREKING is included
+        // Ensure TREKING and Tourist & Tour Guide are included
+        let modified = false;
         if (!parsed.includes('TREKING')) {
           parsed.push('TREKING');
+          modified = true;
+        }
+        if (!parsed.includes('Tourist & Tour Guide')) {
+          parsed.push('Tourist & Tour Guide');
+          modified = true;
+        }
+        if (modified) {
           localStorage.setItem(STORAGE_KEYS.PROGRAMS, JSON.stringify(parsed));
         }
         return parsed;
