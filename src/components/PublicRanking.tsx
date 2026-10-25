@@ -172,7 +172,7 @@ export const PublicRanking: React.FC<PublicRankingProps> = ({
             }`}
           >
             <TrendingUp className="w-4 h-4" />
-            <span>Top Programas</span>
+            <span>Top Temas</span>
           </button>
         </div>
 
@@ -206,7 +206,7 @@ export const PublicRanking: React.FC<PublicRankingProps> = ({
                   <tr className="border-b border-slate-800 bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400 font-semibold font-mono">
                     <th className="py-3.5 px-4 text-center w-16">Puesto</th>
                     <th className="py-3.5 px-4">Participante</th>
-                    <th className="py-3.5 px-4">Programa</th>
+                    <th className="py-3.5 px-4">Tema</th>
                     <th className="py-3.5 px-4 text-right">Puntaje</th>
                     <th className="py-3.5 px-4 text-right">Precisión</th>
                     <th className="py-3.5 px-4 text-center">Nivel</th>
@@ -273,7 +273,7 @@ export const PublicRanking: React.FC<PublicRankingProps> = ({
           {topPrograms.length === 0 ? (
             <div className="p-12 text-center text-slate-400">
               <Users className="w-12 h-12 mx-auto mb-3 text-slate-600" />
-              <p className="font-display font-semibold text-lg text-white">Sin datos de programas aún.</p>
+              <p className="font-display font-semibold text-lg text-white">Sin datos de temas aún.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -281,7 +281,7 @@ export const PublicRanking: React.FC<PublicRankingProps> = ({
                 <thead>
                   <tr className="border-b border-slate-800 bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400 font-semibold font-mono">
                     <th className="py-3.5 px-4 text-center w-16">Puesto</th>
-                    <th className="py-3.5 px-4">Programa de Formación</th>
+                    <th className="py-3.5 px-4">Tema</th>
                     <th className="py-3.5 px-4 text-center">Participantes</th>
                     <th className="py-3.5 px-4 text-right">Promedio Puntos</th>
                     <th className="py-3.5 px-4 text-right">Promedio Aciertos</th>
@@ -334,7 +334,7 @@ export const PublicRanking: React.FC<PublicRankingProps> = ({
               Informe Oficial de Participantes
             </h3>
             <p className="text-xs text-slate-400">
-              Descarga el informe oficial en PDF con todos los aprendices: nombre, programa, puntaje, precisión, nivel y fecha.
+              Descarga el informe oficial en PDF con todos los aprendices: nombre, tema, puntaje, precisión, nivel y fecha.
             </p>
           </div>
         </div>

@@ -155,7 +155,7 @@ export const TREKING_SLIDES: TrekingSlide[] = [
         nameEs: 'Bastones de trekking',
         purposeEn: 'They help with balance on uneven paths.',
         purposeEs: 'Ayudan a mantener el equilibrio en caminos irregulares.',
-        itemImage: '/assets/aistudio/item_poles.png',
+        itemImage: '/assets/aistudio/item_poles_hd.jpg',
         iconName: 'Compass',
         tip: 'Reduces impact on your knees and distributes workload across upper body muscles.',
       },
@@ -422,7 +422,7 @@ export const TREKING_STUDY_CONTENT: TrekingStudyContent = {
       category: 'trekking',
       iconName: 'Compass',
       tip: 'Essential for stability on steep slopes and rocky trails.',
-      itemImage: '/assets/aistudio/item_poles.png',
+      itemImage: '/assets/aistudio/item_poles_hd.jpg',
     },
     {
       id: 'tent',
@@ -668,7 +668,7 @@ export function getTrekingQuizQuestions(): QuizQuestion[] {
   });
 }
 
-export type PresentationSlideType = 'concept' | 'comparison' | 'equipment';
+export type PresentationSlideType = 'article' | 'concept' | 'comparison' | 'equipment';
 
 export interface TrekingPresentationSlide {
   id: string;
@@ -677,33 +677,26 @@ export interface TrekingPresentationSlide {
   type: PresentationSlideType;
   badge: string;
   headerCategory: string;
+  itemNameEn: string;
+  itemNameEs: string;
+  itemImage: string;
+  categoryEn: string;
+  categoryEs: string;
+  purposeEn: string;
+  purposeEs: string;
+  tip: string;
+  tipEs: string;
+  audioScript: string;
+  iconName?: string;
+  // Backward compatibility fields:
   titleEn?: string;
   titleEs?: string;
-  sectionTitle?: string;
-  heroImage?: string;
-  heroImageAlt?: string;
   descriptionEn?: string;
   descriptionEs?: string;
+  heroImage?: string;
+  heroImageAlt?: string;
   keyTakeaway?: string;
   keyTakeawayEs?: string;
-  comparison?: {
-    hiking: {
-      title: string;
-      subtitle: string;
-      duration: string;
-      terrain: string;
-      difficulty: string;
-      summary: string;
-    };
-    trekking: {
-      title: string;
-      subtitle: string;
-      duration: string;
-      terrain: string;
-      difficulty: string;
-      summary: string;
-    };
-  };
   equipmentItems?: Array<{
     nameEn: string;
     nameEs: string;
@@ -713,364 +706,335 @@ export interface TrekingPresentationSlide {
     iconName?: string;
     tip?: string;
   }>;
-  audioScript: string;
 }
 
-export const TREKING_12_PRESENTATION_SLIDES: TrekingPresentationSlide[] = [
-  // 1. Concept: Hiking vs Trekking
+export const TREKING_13_PRESENTATION_SLIDES: TrekingPresentationSlide[] = [
+  // 1. Hiking boots
   {
     id: 'pslide-01',
     slideNumber: 1,
-    totalSlides: 12,
-    type: 'concept',
-    badge: 'DIAPOSITIVA 01 · INTRODUCCIÓN Y COMPARATIVA',
-    headerCategory: 'INTRODUCCIÓN Y COMPARATIVA',
-    heroImage: '/assets/aistudio/slide_img_1_hiking_trekking.jpg',
-    heroImageAlt: 'Hiking trail in green forest contrasted with mountain trekking group',
-    titleEn: 'HIKING VS. TREKKING: CORE DIFFERENCES',
-    titleEs: 'Senderismo vs. Travesía: Diferencias Fundamentales',
-    descriptionEn:
-      'Hiking and trekking are outdoor activities that involve walking in nature, but they differ in duration, difficulty, and level of planning.',
-    descriptionEs:
-      'El senderismo (hiking) y la travesía (trekking) son actividades al aire libre que implican caminar en la naturaleza, pero se diferencian en duración, dificultad y nivel de planificación.',
-    keyTakeaway:
-      'Trekking lasts several days with overnight stays outdoors, while hiking is completed in a single day.',
-    keyTakeawayEs:
-      '(El trekking dura varios días con noches en carpa o refugio; el hiking se completa en un solo día.)',
-    audioScript:
-      'Hiking and trekking are outdoor activities that involve walking in nature, but they differ in duration, difficulty, and level of planning. Hiking is completed in a single day. Trekking lasts several days.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 01 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'CALZADO TÉCNICO DE MONTAÑA',
+    itemNameEn: 'Hiking boots',
+    itemNameEs: 'Botas de montaña / senderismo',
+    itemImage: '/assets/aistudio/item_hiking_boots.png',
+    categoryEn: 'Technical Footwear',
+    categoryEs: 'Calzado Técnico de Montaña',
+    purposeEn: 'They protect your feet and help you walk safely.',
+    purposeEs: 'Protegen tus pies y te ayudan a caminar de forma segura.',
+    tip: 'Technical mountain boots with high ankle support prevent sprains and provide traction on rocky trails.',
+    tipEs: 'Las botas técnicas con caña alta protegen el tobillo contra esguinces y brindan tracción.',
+    audioScript: 'Hiking boots. They protect your feet and help you walk safely on rugged mountain trails.',
+    iconName: 'Footprints',
+    titleEn: 'Hiking boots',
+    titleEs: 'Botas de montaña / senderismo',
+    descriptionEn: 'They protect your feet and help you walk safely.',
+    descriptionEs: 'Protegen tus pies y te ayudan a caminar de forma segura.',
   },
 
-  // 2. Comparison: Hiking vs Trekking Detailed Grid
+  // 2. Backpack
   {
     id: 'pslide-02',
     slideNumber: 2,
-    totalSlides: 12,
-    type: 'comparison',
-    badge: 'DIAPOSITIVA 02 · COMPARATIVA DETALLADA',
-    headerCategory: 'COMPARATIVA DETALLADA',
-    sectionTitle: 'COMPARATIVA DETALLADA: HIKING VS. TREKKING',
-    comparison: {
-      hiking: {
-        title: 'Hiking',
-        subtitle: 'Senderismo de un día',
-        duration: 'Usually completed in a single day, generally taking a few hours.',
-        terrain: 'Official, well-marked, and established paths and trails.',
-        difficulty: 'Easy to moderate, accessible to beginners, families, and casual explorers.',
-        summary: 'Day trip on established nature trails suitable for all fitness levels.',
-      },
-      trekking: {
-        title: 'Trekking',
-        subtitle: 'Travesía de varios días (Excursión remota)',
-        duration: 'A long-distance journey that lasts several days with overnight camping or mountain shelters.',
-        terrain: 'Remote, rugged, or mountainous areas, frequently without clearly marked trails.',
-        difficulty: 'Moderate to challenging; requires physical endurance, navigation skills, and planning.',
-        summary: 'Multi-day wilderness expedition requiring full autonomous gear.',
-      },
-    },
-    audioScript:
-      'Hiking is completed in a single day on official trails. Trekking is a long journey lasting several days with camping.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 02 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'CARGA Y TRANSPORTE',
+    itemNameEn: 'Backpack',
+    itemNameEs: 'Mochila / Morral de travesía',
+    itemImage: '/assets/aistudio/item_backpack.png',
+    categoryEn: 'Load & Cargo',
+    categoryEs: 'Carga y Transporte',
+    purposeEn: 'It carries your water, food, and personal items.',
+    purposeEs: 'Lleva tu agua, comida y pertenencias personales.',
+    tip: 'A large backpack (50L to 75L) with load lifters and hip belt is essential for multi-day expeditions.',
+    tipEs: 'Una mochila grande (50L a 75L) con soporte lumbar distribuye el peso para travesías largas.',
+    audioScript: 'Backpack. It carries your water, food, and personal items for multi-day expeditions.',
+    iconName: 'Package',
+    titleEn: 'Backpack',
+    titleEs: 'Mochila / Morral de travesía',
+    descriptionEn: 'It carries your water, food, and personal items.',
+    descriptionEs: 'Lleva tu agua, comida y pertenencias personales.',
   },
 
-  // 3. Concept: Footwear & Backpack
+  // 3. Trekking poles
   {
     id: 'pslide-03',
     slideNumber: 3,
-    totalSlides: 12,
-    type: 'concept',
-    badge: 'DIAPOSITIVA 03 · EQUIPAMIENTO ESENCIAL 1',
-    headerCategory: 'EQUIPAMIENTO ESENCIAL 1',
-    heroImage: '/assets/aistudio/slide_img_2_boots_backpack.jpg',
-    heroImageAlt: 'Rugged leather hiking boots and large expedition backpack overlook',
-    titleEn: 'ESSENTIAL FOOTWEAR & CARGO: BOOTS AND BACKPACK',
-    titleEs: 'Calzado Técnico y Carga: Botas de Montaña y Mochila',
-    descriptionEn:
-      'Footwear protects your lower joints from rocky terrain, while a high-capacity backpack secures all clothing, hydration, and nutrition for multi-day endurance.',
-    descriptionEs:
-      'El calzado técnico protege tus articulaciones del terreno pedregoso, mientras que una mochila de gran capacidad resguarda abrigo, hidratación y comida para varios días.',
-    keyTakeaway:
-      'Hiking boots protect your feet on uneven trails, and a large backpack carries your food, water, and clothes.',
-    keyTakeawayEs:
-      '(Las botas protegen tus pies en caminos difíciles, y la mochila transporta tu comida, agua y ropa.)',
-    audioScript:
-      'Hiking boots protect your feet and help you walk safely. A large backpack carries your water, food, and personal items.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 03 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'EQUILIBRIO Y ESTABILIDAD',
+    itemNameEn: 'Trekking poles',
+    itemNameEs: 'Bastones de trekking',
+    itemImage: '/assets/aistudio/item_poles_hd.jpg',
+    categoryEn: 'Stability & Balance',
+    categoryEs: 'Estabilidad y Equilibrio',
+    purposeEn: 'They help with balance on uneven paths.',
+    purposeEs: 'Ayudan a mantener el equilibrio en caminos irregulares.',
+    tip: 'Reduces impact on your knees and distributes workload across your upper body muscles.',
+    tipEs: 'Reducen hasta un 25% el impacto en las rodillas y ayudan a sortear terrenos resbalosos.',
+    audioScript: 'Trekking poles. They help with balance on uneven paths and reduce impact on knees.',
+    iconName: 'Compass',
+    titleEn: 'Trekking poles',
+    titleEs: 'Bastones de trekking',
+    descriptionEn: 'They help with balance on uneven paths.',
+    descriptionEs: 'Ayudan a mantener el equilibrio en caminos irregulares.',
   },
 
-  // 4. Equipment: Boots & Backpack
+  // 4. Tent
   {
     id: 'pslide-04',
     slideNumber: 4,
-    totalSlides: 12,
-    type: 'equipment',
-    badge: 'DIAPOSITIVA 04 · ELEMENTOS & EQUIPAMIENTO',
-    headerCategory: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    sectionTitle: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    equipmentItems: [
-      {
-        nameEn: 'Hiking boots',
-        nameEs: 'Botas de montaña / senderismo',
-        purposeEn: 'They protect your feet and help you walk safely.',
-        purposeEs: 'Protegen tus pies y te ayudan a caminar de forma segura.',
-        itemImage: '/assets/aistudio/item_hiking_boots.png',
-        tip: 'Technical mountain boots with high ankle support prevent sprains and provide traction.',
-      },
-      {
-        nameEn: 'Backpack',
-        nameEs: 'Mochila / Morral de travesía',
-        purposeEn: 'It carries your water, food, and personal items.',
-        purposeEs: 'Lleva tu agua, comida y pertenencias personales.',
-        itemImage: '/assets/aistudio/item_backpack.png',
-        tip: 'A large backpack (50L to 75L) is needed for multi-day expeditions with load lifters.',
-      },
-    ],
-    audioScript:
-      'Hiking boots protect your feet and help you walk safely. A backpack carries your water, food, and personal items.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 04 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'REFUGIO AL AIRE LIBRE',
+    itemNameEn: 'Tent',
+    itemNameEs: 'Carpa / Tienda de campaña',
+    itemImage: '/assets/aistudio/item_tent.png',
+    categoryEn: 'Wilderness Shelter',
+    categoryEs: 'Refugio al Aire Libre',
+    purposeEn: 'It gives you shelter when you sleep outdoors.',
+    purposeEs: 'Te brinda refugio cuando duermes al aire libre.',
+    tip: 'Provides vital windproof and waterproof shelter against unpredictable mountain rain and cold.',
+    tipEs: 'Brinda resguardo impermeable contra lluvia torrencial, viento y bajas temperaturas nocturnas.',
+    audioScript: 'Tent. It gives you shelter when you sleep outdoors in remote mountainous areas.',
+    iconName: 'Tent',
+    titleEn: 'Tent',
+    titleEs: 'Carpa / Tienda de campaña',
+    descriptionEn: 'It gives you shelter when you sleep outdoors.',
+    descriptionEs: 'Te brinda refugio cuando duermes al aire libre.',
   },
 
-  // 5. Concept: Trekking Poles & Tent
+  // 5. Sleeping bag
   {
     id: 'pslide-05',
     slideNumber: 5,
-    totalSlides: 12,
-    type: 'concept',
-    badge: 'DIAPOSITIVA 05 · EQUIPAMIENTO ESENCIAL 2',
-    headerCategory: 'EQUIPAMIENTO ESENCIAL 2',
-    heroImage: '/assets/aistudio/slide_img_3_tent_poles.jpg',
-    heroImageAlt: 'Green mountain tent pitched with trekking poles in meadow',
-    titleEn: 'TRAIL BALANCE & OUTDOOR SHELTER: TREKKING POLES AND TENT',
-    titleEs: 'Estabilidad y Refugio al Aire Libre: Bastones y Carpa',
-    descriptionEn:
-      'Trekking poles reduce joint stress and maintain equilibrium over steep paths, while an expedition tent provides shelter and warmth when sleeping under the stars.',
-    descriptionEs:
-      'Los bastones de trekking reducen el impacto en las articulaciones y mantienen el equilibrio, mientras que una carpa de expedición brinda refugio al dormir a la intemperie.',
-    keyTakeaway:
-      'Trekking poles give balance on uneven trails; a tent gives you shelter when you sleep outdoors.',
-    keyTakeawayEs:
-      '(Los bastones dan balance en senderos irregulares; la carpa te da refugio al dormir al aire libre.)',
-    audioScript:
-      'Trekking poles help with balance on uneven paths. A tent gives you shelter when you sleep outdoors.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 05 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'DESCANSO Y AISLAMIENTO TÉRMICO',
+    itemNameEn: 'Sleeping bag',
+    itemNameEs: 'Bolsa de dormir / Sleeping',
+    itemImage: '/assets/aistudio/item_sleeping_bag.png',
+    categoryEn: 'Thermal Rest',
+    categoryEs: 'Descanso y Aislamiento Térmico',
+    purposeEn: 'It keeps you warm while you sleep.',
+    purposeEs: 'Te mantiene abrigado mientras duermes.',
+    tip: 'Mummy-style thermal bags trap core heat during sub-zero mountain temperatures.',
+    tipEs: 'Las bolsas térmicas tipo momia conservan el calor corporal durante las noches gélidas.',
+    audioScript: 'Sleeping bag. It keeps you warm while you sleep outdoors.',
+    iconName: 'Moon',
+    titleEn: 'Sleeping bag',
+    titleEs: 'Bolsa de dormir / Sleeping',
+    descriptionEn: 'It keeps you warm while you sleep.',
+    descriptionEs: 'Te mantiene abrigado mientras duermes.',
   },
 
-  // 6. Equipment: Trekking Poles & Tent
+  // 6. Trail food
   {
     id: 'pslide-06',
     slideNumber: 6,
-    totalSlides: 12,
-    type: 'equipment',
-    badge: 'DIAPOSITIVA 06 · ELEMENTOS & EQUIPAMIENTO',
-    headerCategory: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    sectionTitle: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    equipmentItems: [
-      {
-        nameEn: 'Trekking poles',
-        nameEs: 'Bastones de trekking',
-        purposeEn: 'They help with balance on uneven paths.',
-        purposeEs: 'Ayudan a mantener el equilibrio en caminos irregulares.',
-        itemImage: '/assets/aistudio/item_poles.png',
-        tip: 'Reduces impact on your knees and distributes workload across upper body muscles.',
-      },
-      {
-        nameEn: 'Tent',
-        nameEs: 'Carpa / Tienda de campaña',
-        purposeEn: 'It gives you shelter when you sleep outdoors.',
-        purposeEs: 'Te brinda refugio cuando duermes al aire libre.',
-        itemImage: '/assets/aistudio/item_tent.png',
-        tip: 'Provides vital windproof and waterproof shelter against unpredictable mountain rain and cold.',
-      },
-    ],
-    audioScript:
-      'Trekking poles help with balance on uneven paths. A tent gives you shelter when you sleep outdoors.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 06 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'NUTRICIÓN Y ENERGÍA',
+    itemNameEn: 'Trail food',
+    itemNameEs: 'Comida de marcha / Alimentos energéticos',
+    itemImage: '/assets/aistudio/item_trail_food.png',
+    categoryEn: 'Nutrition & Energy',
+    categoryEs: 'Nutrición y Energía',
+    purposeEn: 'It gives you energy during a long journey.',
+    purposeEs: 'Te da energía durante una larga travesía.',
+    tip: 'Dense calorie snacks like nuts, dried fruits, dark chocolate, and energy bars sustain physical endurance.',
+    tipEs: 'Alimentos ricos en calorías y nutrientes aportan energía sostenida durante caminatas extenuantes.',
+    audioScript: 'Trail food. It gives you energy during a long journey.',
+    iconName: 'Utensils',
+    titleEn: 'Trail food',
+    titleEs: 'Comida de marcha / Alimentos energéticos',
+    descriptionEn: 'It gives you energy during a long journey.',
+    descriptionEs: 'Te da energía durante una larga travesía.',
   },
 
-  // 7. Concept: Sleeping Bag, Food and Hydration
+  // 7. Water bottle
   {
     id: 'pslide-07',
     slideNumber: 7,
-    totalSlides: 12,
-    type: 'concept',
-    badge: 'DIAPOSITIVA 07 · DESCANSO Y NUTRICIÓN',
-    headerCategory: 'DESCANSO Y NUTRICIÓN',
-    heroImage: '/assets/aistudio/slide_img_4_sleeping_sustenance.jpg',
-    heroImageAlt: 'Rolled sleeping bag with trail mix snacks and stainless steel water bottle',
-    titleEn: 'THERMAL WARMTH & SUSTENANCE: SLEEPING BAG, FOOD AND HYDRATION',
-    titleEs: 'Calor Térmico y Sustento: Sleeping, Comida e Hidratación',
-    descriptionEn:
-      'Endurance on long treks requires insulating warmth through the night and constant replenishment of calories and fluids along the trail.',
-    descriptionEs:
-      'La resistencia en travesías largas exige aislamiento térmico nocturno y reposición continua de calorías e hidratación en el sendero.',
-    keyTakeaway:
-      'A sleeping bag keeps you warm while you sleep; trail food provides energy and water maintains hydration.',
-    keyTakeawayEs:
-      '(La bolsa de dormir te mantiene abrigado; la comida de marcha aporta energía y el agua hidratación.)',
-    audioScript:
-      'A sleeping bag keeps you warm while you sleep. Trail food gives you energy during a long journey, and a water bottle helps you stay hydrated.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 07 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'HIDRATACIÓN VITAL',
+    itemNameEn: 'Water bottle',
+    itemNameEs: 'Botella de agua / Hidratación',
+    itemImage: '/assets/aistudio/item_water_bottle.jpg',
+    categoryEn: 'Hydration',
+    categoryEs: 'Hidratación Vital',
+    purposeEn: 'It helps you stay hydrated.',
+    purposeEs: 'Te ayuda a mantenerte hidratado en todo momento.',
+    tip: 'Carry sufficient water and always treat raw mountain streams with filters or purification tablets before drinking.',
+    tipEs: 'Mantenerse hidratado previene la fatiga; desinfecta siempre el agua silvestre antes de beber.',
+    audioScript: 'Water bottle. It helps you stay hydrated throughout the hike.',
+    iconName: 'Droplets',
+    titleEn: 'Water bottle',
+    titleEs: 'Botella de agua / Hidratación',
+    descriptionEn: 'It helps you stay hydrated.',
+    descriptionEs: 'Te ayuda a mantenerte hidratado en todo momento.',
   },
 
-  // 8. Equipment: Sleeping Bag, Trail Food, Water bottle
+  // 8. Map and compass
   {
     id: 'pslide-08',
     slideNumber: 8,
-    totalSlides: 12,
-    type: 'equipment',
-    badge: 'DIAPOSITIVA 08 · ELEMENTOS & EQUIPAMIENTO',
-    headerCategory: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    sectionTitle: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    equipmentItems: [
-      {
-        nameEn: 'Sleeping bag',
-        nameEs: 'Bolsa de dormir / Sleeping',
-        purposeEn: 'It keeps you warm while you sleep.',
-        purposeEs: 'Te mantiene abrigado mientras duermes.',
-        itemImage: '/assets/aistudio/item_sleeping_bag.png',
-        tip: 'Mummy-style thermal bags trap core heat during sub-zero mountain temperatures.',
-      },
-      {
-        nameEn: 'Trail food',
-        nameEs: 'Comida de marcha / Alimentos energéticos',
-        purposeEn: 'It gives you energy during a long journey.',
-        purposeEs: 'Te da energía durante una larga travesía.',
-        itemImage: '/assets/aistudio/item_trail_food.png',
-        tip: 'Dense calorie snacks like nuts, dried bananas, dark chocolate, and energy bars.',
-      },
-      {
-        nameEn: 'Water bottle',
-        nameEs: 'Botella de agua / Hidratación',
-        purposeEn: 'It helps you stay hydrated.',
-        purposeEs: 'Te ayuda a mantenerte hidratado en todo momento.',
-        itemImage: '/assets/aistudio/item_water_bottle.jpg',
-        iconName: 'Droplets',
-        tip: 'Carry sufficient water and always treat raw mountain streams before drinking.',
-      },
-    ],
-    audioScript:
-      'A sleeping bag keeps you warm while you sleep. Trail food gives you energy during a long journey. A water bottle helps you stay hydrated.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 08 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'ORIENTACIÓN Y NAVEGACIÓN',
+    itemNameEn: 'Map and compass',
+    itemNameEs: 'Mapa y brújula',
+    itemImage: '/assets/aistudio/item_map_compass.png',
+    categoryEn: 'Wilderness Navigation',
+    categoryEs: 'Orientación y Navegación',
+    purposeEn: 'They help you find your way.',
+    purposeEs: 'Te ayudan a encontrar tu camino y orientarte.',
+    tip: 'Paper topographic contour maps and magnetic compasses function in all weather without batteries or cellular signal.',
+    tipEs: 'Herramientas análogas confiables que operan en cualquier clima sin depender de batería ni señal.',
+    audioScript: 'Map and compass. They help you find your way in remote areas.',
+    iconName: 'Navigation',
+    titleEn: 'Map and compass',
+    titleEs: 'Mapa y brújula',
+    descriptionEn: 'They help you find your way.',
+    descriptionEs: 'Te ayudan a encontrar tu camino y orientarte.',
   },
 
-  // 9. Concept: Navigation & First Aid
+  // 9. First aid kit
   {
     id: 'pslide-09',
     slideNumber: 9,
-    totalSlides: 12,
-    type: 'concept',
-    badge: 'DIAPOSITIVA 09 · ORIENTACIÓN Y SEGURIDAD',
-    headerCategory: 'ORIENTACIÓN Y SEGURIDAD',
-    heroImage: '/assets/aistudio/slide_img_5_map_navigation.jpg',
-    heroImageAlt: 'Topographic contour map with magnetic compass and red medical first aid pouch',
-    titleEn: 'WILDERNESS NAVIGATION & SAFETY: MAP, COMPASS AND FIRST AID',
-    titleEs: 'Navegación Silvestre y Seguridad: Mapa, Brújula y Primeros Auxilios',
-    descriptionEn:
-      'Remote mountain routes often lack cellular reception. Dependable analog navigation tools and a medical emergency kit are vital safety safeguards.',
-    descriptionEs:
-      'Las rutas de montaña remotas carecen de señal de celular. Las herramientas de navegación analógicas y un botiquín médico son seguros vitales de supervivencia.',
-    keyTakeaway:
-      'A map and compass help you find your way in remote areas without phone signal.',
-    keyTakeawayEs:
-      '(El mapa y la brújula te ayudan a encontrar tu camino en zonas remotas sin señal telefónica.)',
-    audioScript:
-      'A map and compass help you find your way. A first aid kit provides emergency medical care outdoors.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 09 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'SEGURIDAD Y PRIMEROS AUXILIOS',
+    itemNameEn: 'First aid kit',
+    itemNameEs: 'Botiquín de primeros auxilios',
+    itemImage: '/assets/aistudio/item_first_aid_kit.jpg',
+    categoryEn: 'Emergency Care',
+    categoryEs: 'Seguridad y Primeros Auxilios',
+    purposeEn: 'Provides emergency care for cuts, blisters, and trail injuries.',
+    purposeEs: 'Proporciona atención de emergencia para cortes, ampollas y lesiones en ruta.',
+    tip: 'Include blister bandages, antiseptic wipes, sterile gauze, pain relievers, and medical adhesive tape.',
+    tipEs: 'Debe contener apósitos para ampollas, antisépticos, gasa estéril y analgésicos para imprevistos.',
+    audioScript: 'First aid kit. Provides emergency care for cuts, blisters, and trail injuries.',
+    iconName: 'ShieldCheck',
+    titleEn: 'First aid kit',
+    titleEs: 'Botiquín de primeros auxilios',
+    descriptionEn: 'Provides emergency care for cuts, blisters, and trail injuries.',
+    descriptionEs: 'Proporciona atención de emergencia para cortes, ampollas y lesiones en ruta.',
   },
 
-  // 10. Equipment: Map and compass, First aid kit
+  // 10. Binoculars
   {
     id: 'pslide-10',
     slideNumber: 10,
-    totalSlides: 12,
-    type: 'equipment',
-    badge: 'DIAPOSITIVA 10 · ELEMENTOS & EQUIPAMIENTO',
-    headerCategory: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    sectionTitle: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    equipmentItems: [
-      {
-        nameEn: 'Map and compass',
-        nameEs: 'Mapa y brújula',
-        purposeEn: 'They help you find your way.',
-        purposeEs: 'Te ayudan a encontrar tu camino y orientarte.',
-        itemImage: '/assets/aistudio/item_map_compass.png',
-        tip: 'Paper topographic contour maps and magnetic compasses function in all weather without batteries.',
-      },
-      {
-        nameEn: 'First aid kit',
-        nameEs: 'Botiquín de primeros auxilios',
-        purposeEn: 'Provides emergency care for cuts, blisters, and trail injuries.',
-        purposeEs: 'Proporciona atención de emergencia para cortes, ampollas y lesiones en ruta.',
-        itemImage: '/assets/aistudio/item_first_aid_kit.jpg',
-        iconName: 'ShieldCheck',
-        tip: 'Include blister bandages, antiseptic wipes, sterile gauze, pain relievers, and medical tape.',
-      },
-    ],
-    audioScript:
-      'A map and compass help you find your way. A first aid kit provides emergency medical care outdoors.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 10 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'ÓPTICA Y OBSERVACIÓN DE AVES',
+    itemNameEn: 'Binoculars',
+    itemNameEs: 'Binoculares / Prismáticos',
+    itemImage: '/assets/aistudio/item_binoculars.png',
+    categoryEn: 'Birdwatching Optics',
+    categoryEs: 'Óptica y Observación de Aves',
+    purposeEn: 'They help you see birds from far away.',
+    purposeEs: 'Te ayudan a ver las aves desde lejos.',
+    tip: 'Optical magnification (8x42) reveals tiny plumage colors without scaring or disturbing wildlife.',
+    tipEs: 'Permiten apreciar detalles minuciosos del plumaje y comportamiento de las aves a distancia.',
+    audioScript: 'Binoculars. They help you see birds and wildlife from far away.',
+    iconName: 'Eye',
+    titleEn: 'Binoculars',
+    titleEs: 'Binoculares / Prismáticos',
+    descriptionEn: 'They help you see birds from far away.',
+    descriptionEs: 'Te ayudan a ver las aves desde lejos.',
   },
 
-  // 11. Concept: Birdwatching
+  // 11. Bird guide
   {
     id: 'pslide-11',
     slideNumber: 11,
-    totalSlides: 12,
-    type: 'concept',
-    badge: 'DIAPOSITIVA 11 · FAUNA Y OBSERVACIÓN',
-    headerCategory: 'FAUNA Y OBSERVACIÓN',
-    heroImage: '/assets/aistudio/slide_img_6_birdwatching.jpg',
-    heroImageAlt: 'Birdwatching binoculars, illustrated bird guide book and field notes notebook',
-    titleEn: 'SPECIALIZED ACTIVITY: BIRDWATCHING (AVISTAMIENTO DE AVES)',
-    titleEs: 'Actividad Especializada: Avistamiento de Aves (Birdwatching)',
-    descriptionEn:
-      'Birdwatching is observing birds in their natural habitats. It pairs outdoor trekking with optics, field identification guides, and ecological notes.',
-    descriptionEs:
-      'El avistamiento de aves es observar aves en sus hábitats naturales. Combina senderismo con óptica, guías de identificación de campo y notas ecológicas.',
-    keyTakeaway:
-      'Binoculars help see birds far away, the bird guide identifies species, and the notebook records observations.',
-    keyTakeawayEs:
-      '(Los binoculares permiten ver aves a lo lejos, la guía identifica especies y el cuaderno registra observaciones.)',
-    audioScript:
-      'Birdwatching is observing birds in their natural habitats. Binoculars help you see birds from far away. A bird guide helps you identify different bird species.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 11 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'GUÍA DE CAMPO E IDENTIFICACIÓN',
+    itemNameEn: 'Bird guide',
+    itemNameEs: 'Guía de aves / Manual de identificación',
+    itemImage: '/assets/aistudio/item_bird_guide.png',
+    categoryEn: 'Species Identification',
+    categoryEs: 'Guía de Campo e Identificación',
+    purposeEn: 'It helps you identify different bird species.',
+    purposeEs: 'Te ayuda a identificar diferentes especies de aves.',
+    tip: 'Features regional species range maps, scientific names, plumage variations, and behavioral clues.',
+    tipEs: 'Manual ilustrado con nombres científicos, cantos y mapas para clasificar especies en campo.',
+    audioScript: 'Bird guide. It helps you identify different bird species.',
+    iconName: 'Book',
+    titleEn: 'Bird guide',
+    titleEs: 'Guía de aves / Manual de identificación',
+    descriptionEn: 'It helps you identify different bird species.',
+    descriptionEs: 'Te ayuda a identificar diferentes especies de aves.',
   },
 
-  // 12. Equipment: Birdwatching items
+  // 12. Camera
   {
     id: 'pslide-12',
     slideNumber: 12,
-    totalSlides: 12,
-    type: 'equipment',
-    badge: 'DIAPOSITIVA 12 · ELEMENTOS & EQUIPAMIENTO',
-    headerCategory: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    sectionTitle: 'ELEMENTOS & EQUIPAMIENTO DEL TEMA',
-    equipmentItems: [
-      {
-        nameEn: 'Binoculars',
-        nameEs: 'Binoculares / Prismáticos',
-        purposeEn: 'They help you see birds from far away.',
-        purposeEs: 'Te ayudan a ver las aves desde lejos.',
-        itemImage: '/assets/aistudio/item_binoculars.png',
-        tip: 'Optical magnification (8x42) reveals tiny plumage colors without scaring wildlife.',
-      },
-      {
-        nameEn: 'Bird guide',
-        nameEs: 'Guía de aves / Manual de identificación',
-        purposeEn: 'It helps you identify different bird species.',
-        purposeEs: 'Te ayuda a identificar diferentes especies de aves.',
-        itemImage: '/assets/aistudio/item_bird_guide.png',
-        tip: 'Features regional species range maps, scientific names, and behavioral clues.',
-      },
-      {
-        nameEn: 'Camera',
-        nameEs: 'Cámara fotográfica',
-        purposeEn: 'It lets you take pictures of birds without disturbing them.',
-        purposeEs: 'Te permite tomar fotos de aves sin perturbarlas.',
-        itemImage: '/assets/aistudio/item_birdwatching_desk.png',
-        tip: 'Zoom lenses allow documentation for citizen science biodiversity platforms.',
-      },
-      {
-        nameEn: 'Notebook and pencil',
-        nameEs: 'Cuaderno de campo y lápiz',
-        purposeEn: 'What you use to write your observations.',
-        purposeEs: 'Lo que usas para registrar tus observaciones de campo.',
-        itemImage: '/assets/aistudio/item_notebook_pencil.jpg',
-        iconName: 'BookOpen',
-        tip: 'Record species counts, elevation, plumage variations, and time of sighting.',
-      },
-    ],
-    audioScript:
-      'Binoculars help you see birds from far away. A bird guide helps you identify different bird species. A camera lets you take pictures without disturbing them, and a notebook and pencil are what you use to write your observations.',
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 12 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'REGISTRO VISUAL DE BIODIVERSIDAD',
+    itemNameEn: 'Camera',
+    itemNameEs: 'Cámara fotográfica',
+    itemImage: '/assets/aistudio/item_birdwatching_desk.png',
+    categoryEn: 'Visual Documentation',
+    categoryEs: 'Registro Visual de Biodiversidad',
+    purposeEn: 'It lets you take pictures of birds without disturbing them.',
+    purposeEs: 'Te permite tomar fotos de aves sin perturbarlas.',
+    tip: 'Zoom telephoto lenses allow ethical documentation for citizen science biodiversity platforms.',
+    tipEs: 'El teleobjetivo permite fotografiar aves a gran distancia sin alterar su comportamiento natural.',
+    audioScript: 'Camera. It lets you take pictures of birds without disturbing them.',
+    iconName: 'Camera',
+    titleEn: 'Camera',
+    titleEs: 'Cámara fotográfica',
+    descriptionEn: 'It lets you take pictures of birds without disturbing them.',
+    descriptionEs: 'Te permite tomar fotos de aves sin perturbarlas.',
+  },
+
+  // 13. Notebook and pencil
+  {
+    id: 'pslide-13',
+    slideNumber: 13,
+    totalSlides: 13,
+    type: 'article',
+    badge: 'DIAPOSITIVA 13 DE 13 · ARTÍCULOS & EQUIPAMIENTO',
+    headerCategory: 'NOTAS DE CAMPO Y OBSERVACIONES',
+    itemNameEn: 'Notebook and pencil',
+    itemNameEs: 'Cuaderno de campo y lápiz',
+    itemImage: '/assets/aistudio/item_notebook_pencil.jpg',
+    categoryEn: 'Field Logs',
+    categoryEs: 'Notas de Campo y Observaciones',
+    purposeEn: 'What you use to write your observations.',
+    purposeEs: 'Lo que usas para registrar tus observaciones de campo.',
+    tip: 'Record species counts, elevation, geographic coordinates, weather, and exact sighting times.',
+    tipEs: 'Herramienta fundamental para anotar datos ecológicos, fecha, hora y descripción de hábitat.',
+    audioScript: 'Notebook and pencil. What you use to write your observations.',
+    iconName: 'BookOpen',
+    titleEn: 'Notebook and pencil',
+    titleEs: 'Cuaderno de campo y lápiz',
+    descriptionEn: 'What you use to write your observations.',
+    descriptionEs: 'Lo que usas para registrar tus observaciones de campo.',
   },
 ];
+
+// Alias for backwards compatibility
+export const TREKING_12_PRESENTATION_SLIDES = TREKING_13_PRESENTATION_SLIDES;
+export const TREKING_PRESENTATION_SLIDES = TREKING_13_PRESENTATION_SLIDES;

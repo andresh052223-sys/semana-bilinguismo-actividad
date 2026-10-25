@@ -37,11 +37,14 @@ import { soundManager } from '../services/audioService';
 import {
   TREKING_STUDY_CONTENT,
   TREKING_12_QUESTIONS,
-  TREKING_12_PRESENTATION_SLIDES,
+  TREKING_13_PRESENTATION_SLIDES,
   TrekingPresentationSlide,
 } from '../data/trekingData';
 import { ParticipantData, QuizResult } from '../types/quiz';
 import { determineEnglishLevel } from '../services/quizEngine';
+
+// 13 Standalone Article Slides Deck
+const TREKING_SLIDES_DECK = TREKING_13_PRESENTATION_SLIDES;
 
 const getQuestionImage = (qNum: number): string => {
   switch (qNum) {
@@ -60,15 +63,15 @@ const getQuestionImage = (qNum: number): string => {
     case 7:
       return '/assets/aistudio/item_bird_guide.png';
     case 8:
-      return '/assets/aistudio/item_camera.png';
+      return '/assets/aistudio/item_notebook_pencil.jpg';
     case 9:
       return '/assets/aistudio/slide_img_1_hiking_trekking.jpg';
     case 10:
-      return '/assets/aistudio/item_water_bottle.jpg';
+      return '/assets/aistudio/item_birdwatching_desk.png';
     case 11:
-      return '/assets/aistudio/item_poles.png';
+      return '/assets/aistudio/item_water_bottle.jpg';
     case 12:
-      return '/assets/aistudio/item_first_aid_kit.jpg';
+      return '/assets/aistudio/item_poles_hd.jpg';
     default:
       return '/assets/aistudio/slide_img_1_hiking_trekking.jpg';
   }
@@ -117,6 +120,9 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
   const [correctCount, setCorrectCount] = useState(0);
   const [lives, setLives] = useState(3);
   const [quizFinished, setQuizFinished] = useState(false);
+  const [answeredQuestions, setAnsweredQuestions] = useState<
+    Record<number, { selected: string; isCorrect: boolean }>
+  >({});
 
   // Audio Speech synthesis
   const speakText = (text: string) => {
@@ -202,7 +208,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
         e.preventDefault();
         if (activePart === 'part1') {
           setCurrentSlideIndex((prev) => {
-            if (prev < TREKING_12_PRESENTATION_SLIDES.length - 1) {
+            if (prev < TREKING_SLIDES_DECK.length - 1) {
               soundManager.playClick();
               return prev + 1;
             }
@@ -210,12 +216,20 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
           });
         } else {
           setCurrentIndex((prev) => {
-            if (prev < TREKING_12_QUESTIONS.length - 1) {
+            const nextIdx = Math.min(prev + 1, TREKING_12_QUESTIONS.length - 1);
+            if (nextIdx !== prev) {
               soundManager.playClick();
-              setSelectedOption(null);
-              setIsAnswered(false);
-              setIsCorrect(false);
-              return prev + 1;
+              const prevAnswer = answeredQuestions[nextIdx];
+              if (prevAnswer) {
+                setSelectedOption(prevAnswer.selected);
+                setIsAnswered(true);
+                setIsCorrect(prevAnswer.isCorrect);
+              } else {
+                setSelectedOption(null);
+                setIsAnswered(false);
+                setIsCorrect(false);
+              }
+              return nextIdx;
             }
             return prev;
           });
@@ -232,12 +246,20 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
           });
         } else {
           setCurrentIndex((prev) => {
-            if (prev > 0) {
+            const prevIdx = Math.max(0, prev - 1);
+            if (prevIdx !== prev) {
               soundManager.playClick();
-              setSelectedOption(null);
-              setIsAnswered(false);
-              setIsCorrect(false);
-              return prev - 1;
+              const prevAnswer = answeredQuestions[prevIdx];
+              if (prevAnswer) {
+                setSelectedOption(prevAnswer.selected);
+                setIsAnswered(true);
+                setIsCorrect(prevAnswer.isCorrect);
+              } else {
+                setSelectedOption(null);
+                setIsAnswered(false);
+                setIsCorrect(false);
+              }
+              return prevIdx;
             }
             return prev;
           });
@@ -249,7 +271,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPresentationMode, activePart]);
+  }, [isPresentationMode, activePart, answeredQuestions]);
 
   // Track browser fullscreen changes
   useEffect(() => {
@@ -269,7 +291,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
 
   const handleNextSlide = () => {
     soundManager.playClick();
-    if (currentSlideIndex < TREKING_12_PRESENTATION_SLIDES.length - 1) {
+    if (currentSlideIndex < TREKING_SLIDES_DECK.length - 1) {
       setCurrentSlideIndex((prev) => prev + 1);
     } else {
       handleStartPart2();
@@ -295,6 +317,22 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
 
   const currentQuestion = TREKING_12_QUESTIONS[currentIndex];
 
+  const handleJumpToQuestion = (targetIdx: number) => {
+    if (targetIdx < 0 || targetIdx >= TREKING_12_QUESTIONS.length) return;
+    soundManager.playClick();
+    setCurrentIndex(targetIdx);
+    const prevAnswer = answeredQuestions[targetIdx];
+    if (prevAnswer) {
+      setSelectedOption(prevAnswer.selected);
+      setIsAnswered(true);
+      setIsCorrect(prevAnswer.isCorrect);
+    } else {
+      setSelectedOption(null);
+      setIsAnswered(false);
+      setIsCorrect(false);
+    }
+  };
+
   const handleSelectOption = (option: string) => {
     if (isAnswered || quizFinished) return;
 
@@ -304,6 +342,11 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
     const isAnsCorrect =
       option.trim().toLowerCase() === currentQuestion.correctAnswer.trim().toLowerCase();
     setIsCorrect(isAnsCorrect);
+
+    setAnsweredQuestions((prev) => ({
+      ...prev,
+      [currentIndex]: { selected: option, isCorrect: isAnsCorrect },
+    }));
 
     if (isAnsCorrect) {
       soundManager.playCorrect();
@@ -316,15 +359,18 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
     }
   };
 
+  const handlePrevQuestion = () => {
+    if (currentIndex > 0) {
+      handleJumpToQuestion(currentIndex - 1);
+    }
+  };
+
   const handleNextQuestion = () => {
     soundManager.playClick();
     if (lives <= 0 || currentIndex + 1 >= TREKING_12_QUESTIONS.length) {
       finishTrekingQuiz();
     } else {
-      setCurrentIndex((prev) => prev + 1);
-      setSelectedOption(null);
-      setIsAnswered(false);
-      setIsCorrect(false);
+      handleJumpToQuestion(currentIndex + 1);
     }
   };
 
@@ -364,6 +410,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
     setCorrectCount(0);
     setLives(3);
     setQuizFinished(false);
+    setAnsweredQuestions({});
   };
 
   const renderEquipmentIcon = (iconName?: string) => {
@@ -405,323 +452,188 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
       <div className="w-full">
         {/* Top Slide Badge & Subtitle */}
         <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-800">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold tracking-widest uppercase">
-            <span>{slide.badge}</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-mono font-bold tracking-widest uppercase">
+            <span>{slide.badge || `DIAPOSITIVA ${slide.slideNumber} DE ${TREKING_SLIDES_DECK.length}`}</span>
           </div>
-          <span className="text-xs text-slate-400 font-medium">
-            Bilingualism Week · Material Oficial
+          <span className="text-xs sm:text-sm text-slate-400 font-medium">
+            Bilingualism Week · 13 Artículos de Treking
           </span>
         </div>
 
-        {/* TYPE 1: CONCEPT SLIDES (1, 3, 5, 7, 9, 11) */}
-        {slide.type === 'concept' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left Column: Hero Image with Caption */}
-            <div className="lg:col-span-5 flex flex-col gap-2">
+        {/* TYPE 0: STANDALONE ARTICLE SLIDE (13 Standalone Slides: 1 Item Per Slide) */}
+        {(slide.type === 'article' || Boolean(slide.itemNameEn)) && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+            {/* Left 6 Columns: Extra-Large Item Image Showcase - Fills the space completely */}
+            <div className={`flex flex-col items-center justify-center ${isPresentation ? 'lg:col-span-6' : 'lg:col-span-5'}`}>
               <div
                 onClick={() =>
-                  slide.heroImage &&
+                  slide.itemImage &&
                   setModalImage({
-                    url: slide.heroImage,
-                    title: slide.titleEn || 'Imagen Temática',
-                    caption: slide.heroImageAlt,
+                    url: slide.itemImage,
+                    title: slide.itemNameEn || 'Artículo de Treking',
+                    caption: slide.purposeEn,
                   })
                 }
-                className="group relative rounded-2xl overflow-hidden border-2 border-slate-750 hover:border-emerald-500/70 transition-all shadow-2xl cursor-pointer aspect-video bg-slate-950 flex items-center justify-center"
+                className={`group relative rounded-3xl overflow-hidden border-2 border-emerald-500/40 hover:border-emerald-400 transition-all shadow-2xl cursor-pointer bg-slate-950 w-full flex items-center justify-center ${
+                  isPresentation
+                    ? 'aspect-[16/10] max-h-[58vh] sm:max-h-[64vh]'
+                    : 'aspect-[16/10] max-h-[44vh] sm:max-h-[50vh]'
+                }`}
               >
-                {slide.heroImage && (
+                {slide.itemImage ? (
                   <img
-                    src={slide.heroImage}
-                    alt={slide.heroImageAlt || 'Imagen Temática'}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    src={slide.itemImage}
+                    alt={slide.itemNameEn || 'Artículo de Treking'}
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
+                ) : (
+                  <div className="p-8 text-emerald-400">
+                    {renderEquipmentIcon(slide.iconName)}
+                  </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30 pointer-events-none" />
 
-                <div className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-slate-900/80 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                  <Maximize2 className="w-4 h-4 text-emerald-400" />
+                {/* Subtle dark gradient overlay at bottom for maximum contrast */}
+                <div className="absolute inset-x-0 bottom-0 h-24 sm:h-28 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+
+                {/* Top Right Zoom Icon */}
+                <div className="absolute top-4 right-4 p-2.5 rounded-2xl bg-slate-900/90 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-md shadow-xl border border-slate-700">
+                  <Maximize2 className="w-5 h-5 text-emerald-400" />
                 </div>
 
-                <div className="absolute bottom-2.5 left-3 right-3 text-left pointer-events-none">
-                  <span className="text-[10px] font-mono text-emerald-300 font-bold block uppercase tracking-wider">
-                    IMAGEN TEMÁTICA
-                  </span>
-                  <span className="text-xs text-slate-200 line-clamp-1 font-medium">
-                    {slide.heroImageAlt}
-                  </span>
+                {/* Bottom Overlay Info Pill */}
+                <div className="absolute bottom-3 sm:bottom-4 left-4 right-4 p-3 rounded-2xl bg-slate-950/90 backdrop-blur-md border border-slate-800 pointer-events-none text-left flex items-center justify-between shadow-2xl">
+                  <div>
+                    <span className="text-[11px] font-mono text-emerald-400 font-bold block uppercase tracking-wider">
+                      ARTÍCULO #{slide.slideNumber} DE 13
+                    </span>
+                    <span className="text-sm sm:text-base text-white font-bold leading-tight">
+                      {slide.itemNameEn}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-slate-900 text-emerald-400">
+                    {renderEquipmentIcon(slide.iconName)}
+                  </div>
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-400 italic text-center">
+              <p className="text-xs text-slate-400 italic text-center mt-2.5">
                 Haz clic en la imagen para ampliar en alta definición
               </p>
             </div>
 
-            {/* Right Column: Title, Quotes & Dato Clave */}
-            <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
+            {/* Right 6 Columns: Giant Text, Pronunciation, Meaning and Tips */}
+            <div className={`flex flex-col justify-center space-y-5 ${isPresentation ? 'lg:col-span-6' : 'lg:col-span-7'}`}>
+              {/* Category Badge & Pronunciation Audio */}
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <span className="px-3.5 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-xs sm:text-sm font-bold tracking-widest uppercase">
+                  {slide.headerCategory || slide.categoryEs || 'EQUIPAMIENTO DE TREKKING'}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    speakText(
+                      slide.audioScript || `${slide.itemNameEn}. ${slide.purposeEn}`
+                    )
+                  }
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-850 hover:bg-slate-800 text-emerald-400 hover:text-emerald-300 border border-slate-750 text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer"
+                  title="Escuchar pronunciación en inglés"
+                >
+                  <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+                  <span>Pronunciar</span>
+                </button>
+              </div>
+
+              {/* Giant Name in English and Spanish */}
               <div>
                 <h2
                   className={`font-display font-black text-white tracking-tight uppercase leading-tight ${
-                    isPresentation ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'
+                    isPresentation
+                      ? 'text-4xl sm:text-6xl lg:text-7xl xl:text-8xl'
+                      : 'text-3xl sm:text-5xl lg:text-6xl'
                   }`}
                 >
-                  {slide.titleEn}
+                  {slide.itemNameEn}
                 </h2>
-                <h3 className="text-sm sm:text-lg font-bold text-emerald-400 mt-1 mb-3">
-                  {slide.titleEs}
+                <h3
+                  className={`font-bold text-emerald-400 mt-2 ${
+                    isPresentation
+                      ? 'text-2xl sm:text-3xl lg:text-4xl'
+                      : 'text-xl sm:text-2xl lg:text-3xl'
+                  }`}
+                >
+                  {slide.itemNameEs}
                 </h3>
-
-                {/* Main Definition Card */}
-                <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2 mb-3">
-                  <p className="text-sm sm:text-base text-slate-100 font-semibold leading-relaxed">
-                    {slide.descriptionEn}
-                  </p>
-                  <p className="text-xs sm:text-sm text-slate-400 font-normal leading-relaxed border-t border-slate-850 pt-2">
-                    {slide.descriptionEs}
-                  </p>
-                </div>
               </div>
 
-              {/* Dato Clave para el Cuestionario */}
-              {slide.keyTakeaway && (
-                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              {/* Giant Purpose Quote Box */}
+              <div
+                className={`rounded-3xl bg-slate-950/90 border-2 border-slate-800 space-y-3 shadow-xl ${
+                  isPresentation ? 'p-6 sm:p-8' : 'p-5 sm:p-6'
+                }`}
+              >
+                <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs sm:text-sm font-bold uppercase tracking-wider">
+                  <BookOpen className="w-4 h-4" />
+                  <span>PROPÓSITO / FUNCIÓN PRINCIPAL:</span>
+                </div>
+                <p
+                  className={`text-slate-100 font-bold leading-relaxed ${
+                    isPresentation
+                      ? 'text-2xl sm:text-3xl lg:text-4xl'
+                      : 'text-lg sm:text-2xl'
+                  }`}
+                >
+                  “{slide.purposeEn}”
+                </p>
+                <p
+                  className={`text-slate-300 font-medium leading-relaxed border-t border-slate-850 pt-3 ${
+                    isPresentation ? 'text-lg sm:text-xl lg:text-2xl' : 'text-sm sm:text-base'
+                  }`}
+                >
+                  {slide.purposeEs}
+                </p>
+              </div>
+
+              {/* Tip / Key Takeaway for the quiz */}
+              {slide.tip && (
+                <div
+                  className={`rounded-3xl bg-amber-500/10 border-2 border-amber-500/30 flex items-start gap-4 shadow-lg ${
+                    isPresentation ? 'p-5 sm:p-6' : 'p-4'
+                  }`}
+                >
+                  <Lightbulb
+                    className={`text-amber-400 shrink-0 mt-0.5 ${
+                      isPresentation ? 'w-8 h-8' : 'w-6 h-6'
+                    }`}
+                  />
                   <div>
-                    <strong className="text-xs font-mono uppercase text-amber-400 block tracking-wide">
-                      DATO CLAVE PARA EL CUESTIONARIO:
+                    <strong
+                      className={`font-mono uppercase text-amber-400 block tracking-wide ${
+                        isPresentation ? 'text-xs sm:text-sm' : 'text-[11px]'
+                      }`}
+                    >
+                      DATO CLAVE PARA EL CUESTIONARIO Y CAMPO:
                     </strong>
-                    <span className="text-xs sm:text-sm text-slate-200 font-medium block mt-0.5">
-                      {slide.keyTakeaway}
+                    <span
+                      className={`text-slate-100 font-bold block mt-1 leading-snug ${
+                        isPresentation ? 'text-base sm:text-xl' : 'text-sm sm:text-base'
+                      }`}
+                    >
+                      {slide.tip}
                     </span>
-                    <span className="text-xs text-slate-400 block mt-0.5">
-                      {slide.keyTakeawayEs}
-                    </span>
+                    {slide.tipEs && (
+                      <span
+                        className={`text-slate-300 block mt-1 font-medium ${
+                          isPresentation ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'
+                        }`}
+                      >
+                        {slide.tipEs}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* TYPE 2: COMPARISON SLIDE (Slide 2: Hiking vs Trekking) */}
-        {slide.type === 'comparison' && slide.comparison && (
-          <div>
-            <h3 className="font-display font-black text-xl text-white uppercase tracking-tight mb-4 flex items-center gap-2">
-              <Compass className="w-5 h-5 text-cyan-400" />
-              <span>{slide.sectionTitle || 'COMPARATIVA DETALLADA: HIKING VS. TREKKING'}</span>
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Hiking Column */}
-              <div className="p-5 rounded-2xl bg-slate-950/80 border-2 border-emerald-500/30 hover:border-emerald-500/60 transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
-                        <Footprints className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-display font-black text-xl text-white">
-                          {slide.comparison.hiking.title}
-                        </h4>
-                        <span className="text-xs text-emerald-400 font-medium">
-                          {slide.comparison.hiking.subtitle}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        speakText(
-                          `Hiking. Duration: ${slide.comparison?.hiking.duration} Terrain: ${slide.comparison?.hiking.terrain} Difficulty: ${slide.comparison?.hiking.difficulty}`
-                        )
-                      }
-                      className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
-                      title="Escuchar pronunciación"
-                    >
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-2.5 text-xs sm:text-sm mt-3">
-                    <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                      <strong className="text-emerald-400 block text-[11px] font-mono uppercase mb-0.5">
-                        DURATION:
-                      </strong>
-                      <span className="text-slate-200">{slide.comparison.hiking.duration}</span>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                      <strong className="text-emerald-400 block text-[11px] font-mono uppercase mb-0.5">
-                        TERRAIN AND ROUTES:
-                      </strong>
-                      <span className="text-slate-200">{slide.comparison.hiking.terrain}</span>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                      <strong className="text-emerald-400 block text-[11px] font-mono uppercase mb-0.5">
-                        DIFFICULTY:
-                      </strong>
-                      <span className="text-slate-200">{slide.comparison.hiking.difficulty}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-slate-850 text-xs text-slate-400 italic">
-                  Resumen: {slide.comparison.hiking.summary}
-                </div>
-              </div>
-
-              {/* Trekking Column */}
-              <div className="p-5 rounded-2xl bg-slate-950/80 border-2 border-cyan-500/40 hover:border-cyan-500/70 transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400">
-                        <Compass className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-display font-black text-xl text-white">
-                          {slide.comparison.trekking.title}
-                        </h4>
-                        <span className="text-xs text-cyan-400 font-medium">
-                          {slide.comparison.trekking.subtitle}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        speakText(
-                          `Trekking. Duration: ${slide.comparison?.trekking.duration} Terrain: ${slide.comparison?.trekking.terrain} Difficulty: ${slide.comparison?.trekking.difficulty}`
-                        )
-                      }
-                      className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
-                      title="Escuchar pronunciación"
-                    >
-                      <Volume2 className="w-4 h-4 text-cyan-400" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-2.5 text-xs sm:text-sm mt-3">
-                    <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                      <strong className="text-cyan-400 block text-[11px] font-mono uppercase mb-0.5">
-                        DURATION:
-                      </strong>
-                      <span className="text-slate-200">{slide.comparison.trekking.duration}</span>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                      <strong className="text-cyan-400 block text-[11px] font-mono uppercase mb-0.5">
-                        TERRAIN AND ROUTES:
-                      </strong>
-                      <span className="text-slate-200">{slide.comparison.trekking.terrain}</span>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-                      <strong className="text-cyan-400 block text-[11px] font-mono uppercase mb-0.5">
-                        DIFFICULTY:
-                      </strong>
-                      <span className="text-slate-200">{slide.comparison.trekking.difficulty}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-slate-850 text-xs text-cyan-300/80 italic">
-                  Resumen: {slide.comparison.trekking.summary}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TYPE 3: EQUIPMENT SLIDES (4, 6, 8, 10, 12) */}
-        {slide.type === 'equipment' && slide.equipmentItems && (
-          <div>
-            <h3 className="font-display font-black text-xl text-white uppercase tracking-tight mb-4 flex items-center gap-2">
-              <Package className="w-5 h-5 text-emerald-400" />
-              <span>{slide.sectionTitle || 'ELEMENTOS & EQUIPAMIENTO DEL TEMA'}</span>
-            </h3>
-
-            <div
-              className={`grid gap-4 ${
-                slide.equipmentItems.length === 2
-                  ? 'grid-cols-1 sm:grid-cols-2'
-                  : slide.equipmentItems.length === 3
-                  ? 'grid-cols-1 sm:grid-cols-3'
-                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
-              }`}
-            >
-              {slide.equipmentItems.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-900/80 transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Item Photo from PDF or Fallback Icon */}
-                    {item.itemImage ? (
-                      <div
-                        onClick={() =>
-                          setModalImage({
-                            url: item.itemImage!,
-                            title: item.nameEn,
-                            caption: item.purposeEn,
-                          })
-                        }
-                        className="mb-3 h-32 rounded-xl overflow-hidden bg-white/95 border border-slate-800 relative group cursor-pointer flex items-center justify-center p-2"
-                      >
-                        <img
-                          src={item.itemImage}
-                          alt={item.nameEn}
-                          className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform"
-                          loading="lazy"
-                        />
-                        <div className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Maximize2 className="w-3.5 h-3.5 text-emerald-400" />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="mb-3 h-24 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center">
-                        {renderEquipmentIcon(item.iconName)}
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="font-display font-black text-lg text-white leading-tight">
-                        {item.nameEn}
-                      </h4>
-                      <button
-                        type="button"
-                        onClick={() => speakText(`${item.nameEn}. ${item.purposeEn}`)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 cursor-pointer"
-                        title="Escuchar pronunciación"
-                      >
-                        <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                      </button>
-                    </div>
-
-                    <span className="text-xs text-emerald-400 font-medium block mb-2">
-                      {item.nameEs}
-                    </span>
-
-                    <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-850 mb-2">
-                      <p className="text-xs text-slate-200 leading-snug font-medium">
-                        “{item.purposeEn}”
-                      </p>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        {item.purposeEs}
-                      </p>
-                    </div>
-                  </div>
-
-                  {item.tip && (
-                    <div className="pt-2 border-t border-slate-850/80 text-[11px] text-slate-400 leading-tight">
-                      💡 {item.tip}
-                    </div>
-                  )}
-                </div>
-              ))}
             </div>
           </div>
         )}
@@ -729,10 +641,11 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
     );
   };
 
-  const currentPresentationSlide = TREKING_12_PRESENTATION_SLIDES[currentSlideIndex];
+  const currentPresentationSlide =
+    TREKING_SLIDES_DECK[currentSlideIndex] || TREKING_SLIDES_DECK[0];
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-6 sm:py-10 px-4 flex flex-col justify-center min-h-[85vh]">
+    <div className="w-full max-w-7xl mx-auto py-6 sm:py-10 px-4 sm:px-6 flex flex-col justify-center min-h-[85vh]">
       {/* Top Navigation Row */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
         <button
@@ -752,12 +665,12 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
           {/* THE REQUESTED 'PRESENTAR' BUTTON IN TOP BAR */}
           <button
             type="button"
-            onClick={() => handleOpenPresentation(currentSlideIndex)}
+            onClick={() => handleOpenPresentation(activePart === 'part1' ? currentSlideIndex : currentIndex)}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-display font-black text-xs sm:text-sm tracking-wider uppercase shadow-xl shadow-emerald-500/20 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
-            title="Ampliar pantalla y ver en Modo Presentación (12 Diapositivas)"
+            title="Ampliar pantalla y ver en Modo Presentación (Diapositivas y Cuestionario a Pantalla Completa)"
           >
             <Tv className="w-4 h-4 text-slate-950" />
-            <span>Presentar</span>
+            <span>Presentar Pantalla Completa</span>
           </button>
 
           {/* View PDF File Button */}
@@ -783,7 +696,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
           TREKING
         </h1>
         <p className="text-sm sm:text-base text-slate-400 mt-2 font-medium">
-          Bilingualism Week · 12 Diapositivas Oficiales & Reto de Cuestionario
+          Bilingualism Week · 13 Diapositivas Oficiales & Reto de Cuestionario
         </p>
       </div>
 
@@ -802,7 +715,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
           }`}
         >
           <BookOpen className="w-4 h-4" />
-          <span>Parte 1: Diapositivas</span>
+          <span>Parte 1: Diapositivas (13 Artículos)</span>
         </button>
 
         <button
@@ -829,15 +742,15 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
         <div className="space-y-6 animate-fadeIn">
           {/* Slide Deck Controller Bar */}
           <div className="p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
-            {/* Slide Index Counter & Stepper Pills (1 to 12) */}
+            {/* Slide Index Counter & Stepper Pills (1 to 13) */}
             <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-                Diapositiva {currentSlideIndex + 1} de {TREKING_12_PRESENTATION_SLIDES.length}
+                Diapositiva {currentSlideIndex + 1} de {TREKING_SLIDES_DECK.length}
               </span>
 
-              {/* Quick Stepper: 12 Slides */}
+              {/* Quick Stepper: 13 Slides */}
               <div className="inline-flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-850 flex-wrap">
-                {TREKING_12_PRESENTATION_SLIDES.map((slide, idx) => (
+                {TREKING_SLIDES_DECK.map((slide, idx) => (
                   <button
                     key={slide.id}
                     type="button"
@@ -888,7 +801,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
             <div
               className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-300"
               style={{
-                width: `${((currentSlideIndex + 1) / TREKING_12_PRESENTATION_SLIDES.length) * 100}%`,
+                width: `${((currentSlideIndex + 1) / TREKING_SLIDES_DECK.length) * 100}%`,
               }}
             />
           </div>
@@ -915,9 +828,9 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
               <span>Diapositiva Anterior</span>
             </button>
 
-            {/* Stepper Dots (12 slides) */}
+            {/* Stepper Dots (13 slides) */}
             <div className="flex items-center gap-1.5 flex-wrap justify-center">
-              {TREKING_12_PRESENTATION_SLIDES.map((_, idx) => (
+              {TREKING_SLIDES_DECK.map((_, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -935,7 +848,7 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
               ))}
             </div>
 
-            {currentSlideIndex < TREKING_12_PRESENTATION_SLIDES.length - 1 ? (
+            {currentSlideIndex < TREKING_SLIDES_DECK.length - 1 ? (
               <button
                 type="button"
                 onClick={handleNextSlide}
@@ -1116,148 +1029,260 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
               </div>
             </div>
           ) : (
-            /* Active 12-Question Quiz Player */
-            <div className="max-w-3xl mx-auto">
-              {/* Question Top Header */}
-              <div className="flex items-center justify-between gap-4 mb-4">
+            /* Active 12-Question Quiz Player in Wide High-Impact Layout */
+            <div className="w-full space-y-6">
+              {/* Question Top Header Bar */}
+              <div className="p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <span className="px-3 py-1 rounded-xl bg-slate-850 text-slate-300 font-mono text-xs font-bold border border-slate-800">
+                  <span className="px-3.5 py-1.5 rounded-xl bg-cyan-500/20 text-cyan-300 font-mono text-xs sm:text-sm font-bold border border-cyan-500/30">
                     Pregunta {currentIndex + 1} de {TREKING_12_QUESTIONS.length}
                   </span>
-                  <span className="text-xs text-slate-400 hidden sm:inline">
-                    Página PDF #{currentQuestion.sourcePage}
+                  <span className="text-xs text-slate-400 font-medium">
+                    Página #{currentQuestion.sourcePage} del archivo oficial
                   </span>
                 </div>
 
-                {/* Score and Lives */}
+                {/* Score, Lives & Presentar Button */}
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
                     {[1, 2, 3].map((heart) => (
                       <Heart
                         key={heart}
-                        className={`w-4 h-4 ${
+                        className={`w-4 h-4 sm:w-5 sm:h-5 ${
                           heart <= lives ? 'text-red-500 fill-red-500' : 'text-slate-700'
                         }`}
                       />
                     ))}
                   </div>
 
-                  <span className="text-sm font-display font-black text-emerald-400">
+                  <span className="text-base sm:text-lg font-display font-black text-emerald-400 bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800">
                     {score} pts
                   </span>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenPresentation(currentIndex)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-display font-black text-xs sm:text-sm tracking-wider uppercase shadow-lg shadow-cyan-500/20 transition-all cursor-pointer"
+                    title="Presentar esta pregunta en pantalla completa"
+                  >
+                    <Maximize2 className="w-4 h-4 text-slate-950" />
+                    <span className="hidden sm:inline">Presentar Pantalla Completa</span>
+                    <span className="sm:hidden">Presentar</span>
+                  </button>
                 </div>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800 mb-6">
+              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
                 <div
-                  className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-300"
                   style={{
                     width: `${((currentIndex + 1) / TREKING_12_QUESTIONS.length) * 100}%`,
                   }}
                 />
               </div>
 
-              {/* Question Prompt Card */}
-              <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase">
-                    TREKING QUESTION {currentIndex + 1}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => speakText(currentQuestion.question)}
-                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
-                    title="Escuchar Pregunta"
-                  >
-                    <Volume2 className="w-4 h-4 text-cyan-400" />
-                  </button>
-                </div>
+              {/* Question Interactive Grid (7 cols prompt/options + 5 cols illustration) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                {/* Left 7 Columns: Prompt & Options */}
+                <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
+                  {/* Prompt Card */}
+                  <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border-2 border-slate-800 shadow-2xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-xs sm:text-sm font-mono font-bold tracking-widest text-cyan-400 uppercase">
+                        TREKING QUESTION {currentIndex + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => speakText(currentQuestion.question)}
+                        className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 cursor-pointer shadow-md"
+                        title="Escuchar Pregunta"
+                      >
+                        <Volume2 className="w-5 h-5 text-cyan-400" />
+                      </button>
+                    </div>
 
-                <h3 className="font-display font-black text-2xl sm:text-3xl text-white tracking-tight leading-snug">
-                  {currentQuestion.question}
-                </h3>
-              </div>
-
-              {/* Multiple Choice Options */}
-              <div className="space-y-3 mb-6">
-                {currentQuestion.options.map((option, optIdx) => {
-                  const isSelected = selectedOption === option;
-                  const isOptCorrect =
-                    option.trim().toLowerCase() === currentQuestion.correctAnswer.trim().toLowerCase();
-
-                  let btnStyle =
-                    'bg-slate-900/90 border-slate-800 text-slate-200 hover:bg-slate-850 hover:border-slate-700';
-
-                  if (isAnswered) {
-                    if (isOptCorrect) {
-                      btnStyle = 'bg-emerald-950/80 border-emerald-500 text-emerald-200 shadow-lg';
-                    } else if (isSelected) {
-                      btnStyle = 'bg-red-950/80 border-red-500 text-red-200 shadow-lg';
-                    } else {
-                      btnStyle = 'bg-slate-950/60 border-slate-855 text-slate-500 opacity-60';
-                    }
-                  }
-
-                  return (
-                    <button
-                      key={optIdx}
-                      type="button"
-                      disabled={isAnswered}
-                      onClick={() => handleSelectOption(option)}
-                      className={`w-full p-4 sm:p-5 rounded-2xl border-2 font-display font-bold text-base sm:text-lg flex items-center justify-between transition-all cursor-pointer ${btnStyle}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-xs font-mono font-bold text-slate-400">
-                          {String.fromCharCode(65 + optIdx)}
-                        </span>
-                        <span>{option}</span>
-                      </div>
-
-                      {isAnswered && (
-                        <div>
-                          {isOptCorrect ? (
-                            <CheckCircle2 className="w-6 h-6 text-emerald-400 animate-scaleIn" />
-                          ) : isSelected ? (
-                            <XCircle className="w-6 h-6 text-red-400 animate-scaleIn" />
-                          ) : null}
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Feedback and Next Button */}
-              {isAnswered && (
-                <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeIn">
-                  <div>
-                    <span
-                      className={`text-xs font-mono font-bold uppercase tracking-wider block ${
-                        isCorrect ? 'text-emerald-400' : 'text-red-400'
-                      }`}
-                    >
-                      {isCorrect ? '✓ ¡Respuesta Correcta!' : '✗ Respuesta Incorrecta'}
-                    </span>
-                    <p className="text-sm text-slate-300 mt-1 font-medium">
-                      {currentQuestion.explanation}
-                    </p>
+                    <h3 className="font-display font-black text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight leading-snug">
+                      {currentQuestion.question}
+                    </h3>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleNextQuestion}
-                    className="w-full sm:w-auto py-3.5 px-8 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-white font-display font-black text-base shadow-lg flex items-center justify-center gap-2 shrink-0 cursor-pointer"
-                  >
-                    <span>
-                      {currentIndex + 1 >= TREKING_12_QUESTIONS.length || lives <= 0
-                        ? 'Finalizar y Ver Certificado'
-                        : 'Siguiente Pregunta'}
-                    </span>
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
+                  {/* Multiple Choice Options */}
+                  <div className="space-y-3.5">
+                    {currentQuestion.options.map((option, optIdx) => {
+                      const isSelected = selectedOption === option;
+                      const isOptCorrect =
+                        option.trim().toLowerCase() === currentQuestion.correctAnswer.trim().toLowerCase();
+
+                      let btnStyle =
+                        'bg-slate-900/90 border-slate-800 text-slate-100 hover:bg-slate-850 hover:border-slate-700';
+
+                      if (isAnswered) {
+                        if (isOptCorrect) {
+                          btnStyle = 'bg-emerald-950/90 border-emerald-500 text-emerald-100 shadow-xl ring-2 ring-emerald-500/50';
+                        } else if (isSelected) {
+                          btnStyle = 'bg-red-950/90 border-red-500 text-red-100 shadow-xl ring-2 ring-red-500/50';
+                        } else {
+                          btnStyle = 'bg-slate-950/60 border-slate-900 text-slate-500 opacity-50';
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={optIdx}
+                          type="button"
+                          disabled={isAnswered}
+                          onClick={() => handleSelectOption(option)}
+                          className={`w-full p-4 sm:p-5 rounded-2xl sm:rounded-3xl border-2 font-display font-bold text-base sm:text-xl lg:text-2xl flex items-center justify-between transition-all cursor-pointer ${btnStyle}`}
+                        >
+                          <div className="flex items-center gap-3.5 sm:gap-4 text-left">
+                            <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-slate-950 border-2 border-slate-700 flex items-center justify-center text-sm sm:text-lg font-mono font-black text-cyan-400 shrink-0">
+                              {String.fromCharCode(65 + optIdx)}
+                            </span>
+                            <span className="leading-snug">{option}</span>
+                          </div>
+
+                          {isAnswered && (
+                            <div className="shrink-0 ml-2">
+                              {isOptCorrect ? (
+                                <CheckCircle2 className="w-7 h-7 text-emerald-400 animate-scaleIn" />
+                              ) : isSelected ? (
+                                <XCircle className="w-7 h-7 text-red-400 animate-scaleIn" />
+                              ) : null}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Feedback and Next Button */}
+                  {isAnswered && (
+                    <div className="p-5 sm:p-6 rounded-3xl bg-slate-950/95 border-2 border-slate-800 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeIn">
+                      <div>
+                        <span
+                          className={`text-xs sm:text-sm font-mono font-black uppercase tracking-wider block ${
+                            isCorrect ? 'text-emerald-400' : 'text-red-400'
+                          }`}
+                        >
+                          {isCorrect ? '✓ ¡Respuesta Correcta!' : '✗ Respuesta Incorrecta'}
+                        </span>
+                        <p className="text-sm sm:text-base text-slate-200 mt-1 font-medium">
+                          {currentQuestion.explanation}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleNextQuestion}
+                        className="w-full sm:w-auto py-3.5 px-8 rounded-2xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-display font-black text-base shadow-xl flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                      >
+                        <span>
+                          {currentIndex + 1 >= TREKING_12_QUESTIONS.length || lives <= 0
+                            ? 'Finalizar y Ver Certificado'
+                            : 'Siguiente Pregunta'}
+                        </span>
+                        <ArrowRight className="w-5 h-5 text-slate-950" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* Right 5 Columns: Big Question Context Image */}
+                <div className="lg:col-span-5 flex flex-col justify-center">
+                  <div
+                    onClick={() =>
+                      setModalImage({
+                        url: getQuestionImage(currentQuestion.number),
+                        title: `Pregunta #${currentQuestion.number}: ${currentQuestion.question}`,
+                        caption: `Respuesta correcta: ${currentQuestion.correctAnswer}`,
+                      })
+                    }
+                    className="group relative rounded-3xl overflow-hidden border-2 border-cyan-500/40 hover:border-cyan-400 transition-all shadow-2xl cursor-pointer bg-slate-950 w-full aspect-[16/10] max-h-[44vh] sm:max-h-[48vh] flex items-center justify-center"
+                  >
+                    <img
+                      src={getQuestionImage(currentQuestion.number)}
+                      alt={`Pregunta ${currentQuestion.number}`}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+
+                    {/* Gradient overlay for bottom badge */}
+                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+
+                    <div className="absolute top-3.5 right-3.5 p-2 rounded-xl bg-slate-900/90 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-md shadow-lg border border-slate-700">
+                      <Maximize2 className="w-5 h-5 text-cyan-400" />
+                    </div>
+
+                    <div className="absolute bottom-3 left-4 right-4 p-2.5 rounded-2xl bg-slate-950/90 backdrop-blur-md border border-slate-800 pointer-events-none text-left">
+                      <span className="text-[11px] font-mono text-cyan-300 font-bold block uppercase tracking-wider">
+                        ELEMENTO CLAVE DE LA PREGUNTA #{currentQuestion.number}
+                      </span>
+                      <span className="text-xs text-slate-200 line-clamp-1 font-bold">
+                        {currentQuestion.correctAnswer} · Clic para ampliar
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom In-Page Navigation Bar with 12 Interactive Dots */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl">
+                <button
+                  type="button"
+                  onClick={handlePrevQuestion}
+                  disabled={currentIndex === 0}
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer ${
+                    currentIndex === 0
+                      ? 'bg-slate-950 text-slate-600 border border-slate-850 cursor-not-allowed'
+                      : 'bg-slate-800 hover:bg-slate-750 text-white border border-slate-700'
+                  }`}
+                >
+                  <ArrowLeft className="w-4 h-4 text-cyan-400" />
+                  <span>Pregunta Anterior</span>
+                </button>
+
+                {/* 12 Interactive Stepper Dots */}
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
+                  {TREKING_12_QUESTIONS.map((q, idx) => {
+                    const answered = answeredQuestions[idx];
+                    let dotColor =
+                      'bg-slate-900 text-slate-400 hover:text-white border border-slate-800';
+                    if (currentIndex === idx) {
+                      dotColor = 'bg-cyan-500 text-slate-950 ring-2 ring-cyan-300 shadow-lg scale-110 font-black';
+                    } else if (answered) {
+                      dotColor = answered.isCorrect
+                        ? 'bg-emerald-600 text-white font-bold'
+                        : 'bg-red-600 text-white font-bold';
+                    }
+
+                    return (
+                      <button
+                        key={q.number}
+                        type="button"
+                        onClick={() => handleJumpToQuestion(idx)}
+                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl font-mono text-xs font-bold transition-all cursor-pointer ${dotColor}`}
+                        title={`Ir a pregunta ${idx + 1}`}
+                      >
+                        {idx + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNextQuestion}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-display font-black text-sm shadow-lg transition-all cursor-pointer"
+                >
+                  <span>
+                    {currentIndex + 1 >= TREKING_12_QUESTIONS.length
+                      ? 'Finalizar Cuestionario'
+                      : 'Siguiente Pregunta'}
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-slate-950" />
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -1265,40 +1290,71 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
 
       {/* ========================================================================= */}
       {/* FULLSCREEN PRESENTATION MODE ("PRESENTAR" / AMPLIAR PANTALLA)              */}
+      {/* OCCUPIES THE ENTIRE SCREEN FOR BOTH PARTE 1 AND PARTE 2                   */}
       {/* ========================================================================= */}
       {isPresentationMode && (
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 bg-[#070b14] text-white flex flex-col justify-between p-4 sm:p-8 md:p-10 select-none overflow-y-auto"
+          className="fixed inset-0 z-50 bg-[#060911] text-white flex flex-col justify-between p-3 sm:p-5 lg:p-6 select-none w-screen h-screen overflow-hidden"
         >
-          {/* Presentation Header Bar */}
-          <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-800">
-            {/* Left: Presentation Branding & Slide Badge */}
+          {/* Top Presentation Navigation Bar */}
+          <div className="flex items-center justify-between gap-4 pb-3 border-b border-slate-800 shrink-0">
+            {/* Left: Presentation Branding & Switcher Tabs */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-mono font-bold tracking-widest uppercase">
                 <Tv className="w-4 h-4 text-emerald-400 animate-pulse" />
-                <span>MODO PRESENTACIÓN</span>
+                <span className="hidden sm:inline">MODO PRESENTACIÓN PANTALLA COMPLETA</span>
+                <span className="sm:hidden">PRESENTACIÓN</span>
               </div>
-              <span className="text-xs text-slate-400 hidden md:inline">
-                Global Tourism District · Bilingualism Week
-              </span>
+
+              {/* Switcher Tabs inside Presentation Mode */}
+              <div className="inline-flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => handleSwitchPresentationPart('part1')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activePart === 'part1'
+                      ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Parte 1: Diapositivas ({currentSlideIndex + 1}/{TREKING_SLIDES_DECK.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSwitchPresentationPart('part2')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activePart === 'part2'
+                      ? 'bg-cyan-500 text-slate-950 shadow-md font-black'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Parte 2: Cuestionario ({currentIndex + 1}/12)
+                </button>
+              </div>
             </div>
 
             {/* Right: Audio Narration, Fullscreen toggle, Slide counter, Exit button */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               {/* Audio button */}
               <button
                 type="button"
-                onClick={() => speakText(currentPresentationSlide.audioScript)}
+                onClick={() =>
+                  speakText(
+                    activePart === 'part1'
+                      ? currentPresentationSlide.audioScript
+                      : currentQuestion.question
+                  )
+                }
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 text-xs font-bold transition-all cursor-pointer"
-                title="Escuchar narración en inglés"
+                title="Escuchar audio en inglés"
               >
                 <Volume2 className="w-4 h-4 text-emerald-400" />
-                <span className="hidden sm:inline">Audio</span>
+                <span className="hidden md:inline">Audio</span>
               </button>
 
-              {/* Fullscreen toggle */}
+              {/* Fullscreen browser toggle */}
               <button
                 type="button"
                 onClick={toggleBrowserFullscreen}
@@ -1312,9 +1368,11 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
                 )}
               </button>
 
-              {/* Slide Counter */}
+              {/* Counter badge */}
               <span className="text-xs font-mono font-bold text-slate-300 bg-slate-900 px-3 py-2 rounded-xl border border-slate-800">
-                {currentSlideIndex + 1} / {TREKING_12_PRESENTATION_SLIDES.length}
+                {activePart === 'part1'
+                  ? `${currentSlideIndex + 1} / ${TREKING_SLIDES_DECK.length}`
+                  : `${currentIndex + 1} / ${TREKING_12_QUESTIONS.length}`}
               </span>
 
               {/* Exit Button */}
@@ -1330,77 +1388,371 @@ export const TrekkingModule: React.FC<TrekkingModuleProps> = ({
             </div>
           </div>
 
-          {/* Presentation Main Slide Canvas */}
-          <div className="flex-1 flex flex-col justify-center my-6 max-w-6xl mx-auto w-full">
-            <div className="p-6 sm:p-10 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-              {renderSlideContent(currentPresentationSlide, true)}
-            </div>
-          </div>
+          {/* =================================================================== */}
+          {/* PRESENTATION CANVAS: PARTE 1 (DIAPOSITIVAS)                         */}
+          {/* =================================================================== */}
+          {activePart === 'part1' && (
+            <>
+              <div className="flex-1 flex flex-col justify-center my-auto w-full max-w-[1920px] mx-auto min-h-0 overflow-y-auto lg:overflow-hidden px-2 sm:px-6">
+                <div className="p-5 sm:p-8 lg:p-10 rounded-3xl bg-slate-900/95 border-2 border-slate-800 shadow-2xl relative overflow-hidden w-full my-auto">
+                  <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+                  {renderSlideContent(currentPresentationSlide, true)}
+                </div>
+              </div>
 
-          {/* Presentation Footer Bar */}
-          <div className="max-w-6xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800">
-            {/* Previous Slide Button */}
-            <button
-              type="button"
-              onClick={handlePrevSlide}
-              disabled={currentSlideIndex === 0}
-              className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all cursor-pointer ${
-                currentSlideIndex === 0
-                  ? 'bg-slate-950 text-slate-600 border border-slate-850 cursor-not-allowed'
-                  : 'bg-slate-900 hover:bg-slate-800 text-white border border-slate-700'
-              }`}
-            >
-              <ChevronLeft className="w-5 h-5 text-emerald-400" />
-              <span>Anterior</span>
-            </button>
-
-            {/* 12 Interactive Stepper Dots */}
-            <div className="flex items-center gap-2 flex-wrap justify-center">
-              {TREKING_12_PRESENTATION_SLIDES.map((slide, idx) => (
+              {/* Presentation Footer Bar for Parte 1 */}
+              <div className="max-w-[1920px] mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t border-slate-800 shrink-0 px-2 sm:px-6">
                 <button
-                  key={slide.id}
                   type="button"
-                  onClick={() => {
-                    soundManager.playClick();
-                    setCurrentSlideIndex(idx);
-                  }}
-                  className={`w-8 h-8 rounded-xl font-mono text-xs font-bold transition-all cursor-pointer ${
-                    currentSlideIndex === idx
-                      ? 'bg-emerald-500 text-slate-950 scale-110 shadow-lg shadow-emerald-500/20'
-                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                  onClick={handlePrevSlide}
+                  disabled={currentSlideIndex === 0}
+                  className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl font-bold text-sm transition-all cursor-pointer ${
+                    currentSlideIndex === 0
+                      ? 'bg-slate-950 text-slate-600 border border-slate-850 cursor-not-allowed'
+                      : 'bg-slate-900 hover:bg-slate-800 text-white border border-slate-700'
                   }`}
-                  title={`Diapositiva ${idx + 1}`}
                 >
-                  {idx + 1}
+                  <ChevronLeft className="w-5 h-5 text-emerald-400" />
+                  <span>Anterior</span>
                 </button>
-              ))}
-            </div>
 
-            {/* Next Slide or Finish Button */}
-            {currentSlideIndex < TREKING_12_PRESENTATION_SLIDES.length - 1 ? (
-              <button
-                type="button"
-                onClick={handleNextSlide}
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-[#39A900] hover:from-emerald-500 hover:to-[#44c400] text-white font-display font-black text-sm shadow-xl transition-all cursor-pointer"
-              >
-                <span>Siguiente</span>
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleStartPart2}
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-white font-display font-black text-sm shadow-2xl transition-all animate-pulse cursor-pointer"
-              >
-                <span>¡Iniciar Cuestionario!</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            )}
-          </div>
+                {/* 13 Interactive Stepper Dots */}
+                <div className="flex items-center gap-2 flex-wrap justify-center">
+                  {TREKING_SLIDES_DECK.map((slide, idx) => (
+                    <button
+                      key={slide.id}
+                      type="button"
+                      onClick={() => {
+                        soundManager.playClick();
+                        setCurrentSlideIndex(idx);
+                      }}
+                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                        currentSlideIndex === idx
+                          ? 'bg-emerald-500 text-slate-950 scale-110 shadow-lg shadow-emerald-500/30 font-black'
+                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                      }`}
+                      title={`Diapositiva ${idx + 1}`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Next Slide or Finish Button */}
+                {currentSlideIndex < TREKING_SLIDES_DECK.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={handleNextSlide}
+                    className="inline-flex items-center gap-2 px-7 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-[#39A900] hover:from-emerald-500 hover:to-[#44c400] text-white font-display font-black text-sm shadow-xl transition-all cursor-pointer"
+                  >
+                    <span>Siguiente</span>
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchPresentationPart('part2')}
+                    className="inline-flex items-center gap-2 px-7 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-white font-display font-black text-sm shadow-2xl transition-all animate-pulse cursor-pointer"
+                  >
+                    <span>¡Pasar al Cuestionario!</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* =================================================================== */}
+          {/* PRESENTATION CANVAS: PARTE 2 (CUESTIONARIO DE 12 PREGUNTAS)         */}
+          {/* OCCUPIES THE ENTIRE SCREEN WITH HUGE QUESTIONS, OPTIONS & PHOTOS     */}
+          {/* =================================================================== */}
+          {activePart === 'part2' && (
+            <>
+              <div className="flex-1 flex flex-col justify-center my-auto w-full max-w-[1920px] mx-auto min-h-0 overflow-y-auto lg:overflow-hidden px-2 sm:px-6">
+                {quizFinished ? (
+                  /* Fullscreen Celebration Screen */
+                  <div className="max-w-3xl mx-auto p-8 sm:p-12 rounded-3xl bg-slate-900/95 border-2 border-emerald-500/50 shadow-2xl text-center my-auto">
+                    <div className="w-24 h-24 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center mb-6">
+                      <Trophy className="w-14 h-14 animate-bounce" />
+                    </div>
+
+                    <span className="text-sm font-mono font-black tracking-widest text-emerald-400 uppercase">
+                      ¡RETO TREKING COMPLETADO EN PANTALLA COMPLETA!
+                    </span>
+                    <h2 className="font-display font-black text-4xl sm:text-6xl text-white uppercase mt-2 mb-3">
+                      {participant?.fullName || localName || 'Participante'}
+                    </h2>
+                    <p className="text-lg text-slate-300 mb-8">
+                      Has finalizado las 12 preguntas del archivo PDF de Treking.
+                    </p>
+
+                    <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mb-10">
+                      <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
+                        <span className="text-xs text-slate-400 font-bold block uppercase">Puntaje</span>
+                        <span className="font-display font-black text-3xl sm:text-4xl text-emerald-400">
+                          {score} pts
+                        </span>
+                      </div>
+                      <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
+                        <span className="text-xs text-slate-400 font-bold block uppercase">Aciertos</span>
+                        <span className="font-display font-black text-3xl sm:text-4xl text-cyan-400">
+                          {correctCount} / {TREKING_12_QUESTIONS.length}
+                        </span>
+                      </div>
+                      <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800">
+                        <span className="text-xs text-slate-400 font-bold block uppercase">Nivel</span>
+                        <span className="font-display font-black text-3xl sm:text-4xl text-amber-400">
+                          {determineEnglishLevel(
+                            Math.round((correctCount / TREKING_12_QUESTIONS.length) * 100)
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                      <button
+                        type="button"
+                        onClick={handleRestartQuiz}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-base transition-all cursor-pointer shadow-lg"
+                      >
+                        <RotateCcw className="w-5 h-5" />
+                        <span>Reintentar Cuestionario</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSwitchPresentationPart('part1')}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base transition-all shadow-xl cursor-pointer"
+                      >
+                        <BookOpen className="w-5 h-5" />
+                        <span>Revisar Diapositivas</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Fullscreen Active Question Slide */
+                  <div className="p-5 sm:p-8 lg:p-10 rounded-3xl bg-slate-900/95 border-2 border-slate-800 shadow-2xl relative overflow-hidden w-full my-auto">
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+
+                    {/* Question Header Row inside Card */}
+                    <div className="flex items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-800">
+                      <div className="flex items-center gap-3">
+                        <span className="px-4 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 font-mono text-xs sm:text-sm font-bold tracking-widest uppercase">
+                          PREGUNTA #{currentIndex + 1} DE {TREKING_12_QUESTIONS.length}
+                        </span>
+                        <span className="text-xs sm:text-sm text-slate-400 font-medium hidden sm:inline">
+                          Material PDF Treking · Bilingualism Week
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1.5 bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800">
+                          {[1, 2, 3].map((heart) => (
+                            <Heart
+                              key={heart}
+                              className={`w-5 h-5 ${
+                                heart <= lives ? 'text-red-500 fill-red-500' : 'text-slate-700'
+                              }`}
+                            />
+                          ))}
+                        </div>
+
+                        <span className="text-base sm:text-xl font-display font-black text-emerald-400 bg-slate-950 px-4 py-1.5 rounded-xl border border-slate-800">
+                          {score} pts
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 12-Column Grid: Giant Question + Giant Image */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                      {/* Left 7 Columns: Giant Prompt & Options */}
+                      <div className="lg:col-span-7 flex flex-col justify-center space-y-5">
+                        <div className="space-y-2">
+                          <h3 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-white tracking-tight leading-tight">
+                            {currentQuestion.question}
+                          </h3>
+                        </div>
+
+                        {/* Options with massive readable letters and text */}
+                        <div className="space-y-3.5 pt-2">
+                          {currentQuestion.options.map((option, optIdx) => {
+                            const isSelected = selectedOption === option;
+                            const isOptCorrect =
+                              option.trim().toLowerCase() === currentQuestion.correctAnswer.trim().toLowerCase();
+
+                            let btnStyle =
+                              'bg-slate-950/85 border-slate-800 text-slate-100 hover:bg-slate-800/90 hover:border-slate-700 shadow-md';
+
+                            if (isAnswered) {
+                              if (isOptCorrect) {
+                                btnStyle =
+                                  'bg-emerald-950/90 border-emerald-500 text-emerald-100 shadow-2xl ring-2 ring-emerald-500/60 font-bold';
+                              } else if (isSelected) {
+                                btnStyle =
+                                  'bg-red-950/90 border-red-500 text-red-100 shadow-2xl ring-2 ring-red-500/60';
+                              } else {
+                                btnStyle = 'bg-slate-950/50 border-slate-900 text-slate-500 opacity-50';
+                              }
+                            }
+
+                            return (
+                              <button
+                                key={optIdx}
+                                type="button"
+                                disabled={isAnswered}
+                                onClick={() => handleSelectOption(option)}
+                                className={`w-full p-4 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl border-2 text-left flex items-center justify-between transition-all cursor-pointer ${btnStyle}`}
+                              >
+                                <div className="flex items-center gap-4 sm:gap-5">
+                                  <span className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center font-black text-xl sm:text-2xl lg:text-3xl bg-slate-900 border-2 border-slate-700 text-cyan-400 shrink-0">
+                                    {String.fromCharCode(65 + optIdx)}
+                                  </span>
+                                  <span className="text-xl sm:text-2xl lg:text-3xl font-bold leading-snug">
+                                    {option}
+                                  </span>
+                                </div>
+
+                                {isAnswered && (
+                                  <div className="shrink-0 ml-3">
+                                    {isOptCorrect ? (
+                                      <div className="flex items-center gap-2 text-emerald-400 text-lg sm:text-2xl font-bold">
+                                        <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8" />
+                                        <span>Correcta</span>
+                                      </div>
+                                    ) : isSelected ? (
+                                      <div className="flex items-center gap-2 text-red-400 text-lg sm:text-2xl font-bold">
+                                        <XCircle className="w-7 h-7 sm:w-8 sm:h-8" />
+                                        <span>Incorrecta</span>
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Explanation Box when answered */}
+                        {isAnswered && (
+                          <div className="p-5 sm:p-6 rounded-3xl bg-slate-950/95 border-2 border-slate-800 shadow-2xl space-y-2 animate-fadeIn">
+                            <span
+                              className={`text-sm sm:text-base font-mono font-black uppercase tracking-wider block ${
+                                isCorrect ? 'text-emerald-400' : 'text-red-400'
+                              }`}
+                            >
+                              {isCorrect ? '✓ ¡Respuesta Correcta!' : '✗ Respuesta Incorrecta'}
+                            </span>
+                            <p className="text-lg sm:text-2xl text-slate-200 font-medium leading-relaxed">
+                              {currentQuestion.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right 5 Columns: Giant High-Resolution Question Context Image */}
+                      <div className="lg:col-span-5 flex flex-col justify-center">
+                        <div
+                          onClick={() =>
+                            setModalImage({
+                              url: getQuestionImage(currentQuestion.number),
+                              title: `Pregunta #${currentQuestion.number}: ${currentQuestion.question}`,
+                              caption: `Respuesta correcta: ${currentQuestion.correctAnswer}`,
+                            })
+                          }
+                          className="group relative rounded-3xl overflow-hidden border-2 border-cyan-500/40 hover:border-cyan-400 transition-all shadow-2xl cursor-pointer bg-slate-950 w-full aspect-[16/10] max-h-[58vh] sm:max-h-[64vh] flex items-center justify-center"
+                        >
+                          <img
+                            src={getQuestionImage(currentQuestion.number)}
+                            alt={`Pregunta ${currentQuestion.number}`}
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+
+                          {/* Gradient overlay for bottom title */}
+                          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+
+                          <div className="absolute top-4 right-4 p-2.5 rounded-2xl bg-slate-900/90 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-md shadow-xl border border-slate-700">
+                            <Maximize2 className="w-6 h-6 text-cyan-400" />
+                          </div>
+
+                          <div className="absolute bottom-4 left-5 right-5 p-3 rounded-2xl bg-slate-950/90 backdrop-blur-md border border-slate-800 pointer-events-none text-left">
+                            <span className="text-xs font-mono text-cyan-300 font-bold block uppercase tracking-wider">
+                              ILUSTRACIÓN OFICIAL · PREGUNTA #{currentQuestion.number}
+                            </span>
+                            <span className="text-sm sm:text-base text-slate-200 line-clamp-1 font-bold">
+                              {currentQuestion.correctAnswer}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Presentation Footer Bar for Parte 2 */}
+              <div className="max-w-[1920px] mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t border-slate-800 shrink-0 px-2 sm:px-6">
+                <button
+                  type="button"
+                  onClick={handlePrevQuestion}
+                  disabled={currentIndex === 0}
+                  className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl font-bold text-sm transition-all cursor-pointer ${
+                    currentIndex === 0
+                      ? 'bg-slate-950 text-slate-600 border border-slate-850 cursor-not-allowed'
+                      : 'bg-slate-900 hover:bg-slate-800 text-white border border-slate-700'
+                  }`}
+                >
+                  <ChevronLeft className="w-5 h-5 text-cyan-400" />
+                  <span>Pregunta Anterior</span>
+                </button>
+
+                {/* 12 Interactive Question Stepper Dots */}
+                <div className="flex items-center gap-2 flex-wrap justify-center">
+                  {TREKING_12_QUESTIONS.map((q, idx) => {
+                    const answered = answeredQuestions[idx];
+                    let dotColor =
+                      'bg-slate-900 text-slate-400 hover:text-white border border-slate-800';
+                    if (currentIndex === idx) {
+                      dotColor =
+                        'bg-cyan-500 text-slate-950 ring-2 ring-cyan-300 shadow-lg scale-110 font-black';
+                    } else if (answered) {
+                      dotColor = answered.isCorrect
+                        ? 'bg-emerald-600 text-white font-bold'
+                        : 'bg-red-600 text-white font-bold';
+                    }
+
+                    return (
+                      <button
+                        key={q.number}
+                        type="button"
+                        onClick={() => handleJumpToQuestion(idx)}
+                        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer ${dotColor}`}
+                        title={`Ir a pregunta ${idx + 1}`}
+                      >
+                        {idx + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNextQuestion}
+                  className="inline-flex items-center gap-2 px-7 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-display font-black text-sm shadow-xl transition-all cursor-pointer"
+                >
+                  <span>
+                    {currentIndex + 1 >= TREKING_12_QUESTIONS.length
+                      ? 'Finalizar Cuestionario'
+                      : 'Siguiente Pregunta'}
+                  </span>
+                  <ChevronRight className="w-5 h-5 text-slate-950" />
+                </button>
+              </div>
+            </>
+          )}
 
           {/* Keyboard navigation helper */}
-          <div className="text-center text-[11px] text-slate-400 mt-2">
+          <div className="text-center text-xs text-slate-400 mt-1 shrink-0">
             Navega con las flechas <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-slate-300">←</kbd> <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-slate-300">→</kbd> o presiona <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-slate-300">Esc</kbd> para salir
           </div>
         </div>

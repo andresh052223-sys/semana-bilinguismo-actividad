@@ -1,12 +1,12 @@
 import React from 'react';
-import { Award, Volume2, VolumeX, Tv, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
+import { Award, Volume2, VolumeX, Trophy, Sparkles } from 'lucide-react';
 import { soundManager } from '../services/audioService';
 
 interface HeaderProps {
   currentView: string;
   onNavigate: (view: 'cover' | 'program' | 'ranking' | 'admin' | 'welcome') => void;
-  isTvMode: boolean;
-  onToggleTvMode: () => void;
+  isTvMode?: boolean;
+  onToggleTvMode?: () => void;
   isMuted: boolean;
   onToggleMute: () => void;
 }
@@ -14,8 +14,6 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   currentView,
   onNavigate,
-  isTvMode,
-  onToggleTvMode,
   isMuted,
   onToggleMute,
 }) => {
@@ -67,36 +65,10 @@ export const Header: React.FC<HeaderProps> = ({
             <Trophy className="w-3.5 h-3.5" />
             <span>Ranking Stand</span>
           </button>
-
-          <button
-            onClick={() => onNavigate('admin')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 ${
-              currentView === 'admin'
-                ? 'bg-slate-800 text-white border border-slate-700'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Administrador</span>
-          </button>
         </div>
 
-        {/* Right Utilities: TV Mode & Audio */}
+        {/* Right Utilities: Audio */}
         <div className="flex items-center gap-2">
-          {/* TV Projection Mode toggle */}
-          <button
-            onClick={onToggleTvMode}
-            title={isTvMode ? 'Desactivar Modo TV (Tamaño estándar)' : 'Activar Modo TV / Pantalla Gigante'}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-all ${
-              isTvMode
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-            }`}
-          >
-            <Tv className="w-4 h-4" />
-            <span className="hidden sm:inline">{isTvMode ? 'Modo TV: ON' : 'Modo TV'}</span>
-          </button>
-
           {/* Sound FX toggle */}
           <button
             onClick={() => {
@@ -113,7 +85,7 @@ export const Header: React.FC<HeaderProps> = ({
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </button>
 
-          {/* Mobile Admin & Ranking Quick Access */}
+          {/* Mobile Ranking Quick Access */}
           <div className="flex md:hidden items-center gap-1">
             <button
               onClick={() => onNavigate('ranking')}
@@ -121,13 +93,6 @@ export const Header: React.FC<HeaderProps> = ({
               title="Ranking"
             >
               <Trophy className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onNavigate('admin')}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300"
-              title="Admin"
-            >
-              <ShieldCheck className="w-4 h-4" />
             </button>
           </div>
         </div>

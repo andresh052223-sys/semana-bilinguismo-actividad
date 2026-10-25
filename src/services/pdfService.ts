@@ -325,7 +325,7 @@ export async function generateParticipantsReportPDF(results: QuizResult[]): Prom
   const columns: TableCol[] = [
     { header: '#', width: 14, align: 'center' },
     { header: 'Nombre del Participante', width: 62, align: 'left' },
-    { header: 'Programa de Formación / Tema', width: 70, align: 'left' },
+    { header: 'Tema', width: 70, align: 'left' },
     { header: 'Puntaje', width: 28, align: 'center' },
     { header: 'Precisión', width: 24, align: 'center' },
     { header: 'Nivel', width: 36, align: 'center' },

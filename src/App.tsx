@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { CoverScreen } from './components/CoverScreen';
 import { ProgramSelector } from './components/ProgramSelector';
@@ -40,6 +40,33 @@ export default function App() {
 
   // Sound Muted state
   const [isMuted, setIsMuted] = useState<boolean>(() => soundManager.getMuted());
+
+  // Hidden admin access via keyboard shortcut (Ctrl + Shift + A) or URL hash (#admin)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setCurrentView('admin');
+      }
+    };
+
+    const handleHash = () => {
+      if (window.location.hash === '#admin') {
+        setCurrentView('admin');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('hashchange', handleHash);
+    if (window.location.hash === '#admin') {
+      setCurrentView('admin');
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('hashchange', handleHash);
+    };
+  }, []);
 
   const handleToggleTvMode = () => {
     const updated = !isTvMode;
